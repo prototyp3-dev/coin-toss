@@ -22,5 +22,4 @@ COPY --from=build-stage /opt/venv /opt/venv
 
 WORKDIR /opt/cartesi/dapp
 COPY ./entrypoint.sh .
-COPY ./wallet.py .
-COPY ./l1-l2-l1-cycle.py .
+COPY ./coin-toss.py .

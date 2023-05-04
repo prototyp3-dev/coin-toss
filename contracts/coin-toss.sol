@@ -3,15 +3,20 @@ pragma solidity >=0.7.0 <0.9.0;
 import "@cartesi/rollups/contracts/interfaces/IInput.sol";
 
 contract CoinToss {
-    int8 constant HEADS = 0;
-    int8 constant TAILS = 1;
+    address L2_DAPP = 0xF8C694fd58360De278d5fF2276B7130Bfdc0192A;
 
     struct Game {
-        mapping (address => int) players; // maps players address to his coin choice
+        address winner;
+        address pending_player;
         bool exists;
     }
 
-    mapping (bytes => Game) games; // maps gamekey to game
+    struct Games {
+        uint256 current_match_id; // initial value is 0
+        mapping (uint => Game) matches;
+    }
+
+    mapping (bytes => Games) games; // maps gamekey to gameID
 
     function get_gamekey(address player, address opponent) internal pure returns (bytes memory) {
         bytes memory gamekey;
@@ -24,48 +29,48 @@ contract CoinToss {
         return gamekey;
     }
 
-    // used to create a game, only the first player chooses a side of the coin
-    function play(address opponent, int8 choice) public {
-        require(choice == HEADS || choice == TAILS);
-
+    // used to create or play game between two players
+    function play(address opponent) public {
         bytes memory gamekey = get_gamekey(msg.sender, opponent);
+        Game storage game = games[gamekey].matches[games[gamekey].current_match_id];
+        
+        require(!game.exists || game.pending_player == msg.sender);
 
-        require(!games[gamekey].exists);
-
-        Game storage game = games[gamekey];
-        if (choice == HEADS) {
-            game.players[msg.sender] = HEADS;
-            game.players[opponent] = TAILS;
-        } else {
-            game.players[msg.sender] = TAILS;
-            game.players[opponent] = HEADS;
-        }
-        game.exists = true;
+        if (!game.exists) {
+            game.pending_player = opponent;
+            game.exists = true;
+        } else if (game.pending_player == msg.sender) {
+            l2_coin_toss(gamekey);
+        }        
     }
 
-    // second player call to play
-    function play(address opponent) public returns (address) {
-        bytes memory gamekey = get_gamekey(msg.sender, opponent);
+    function l2_coin_toss(bytes memory gamekey) private {
+        // generate randomness
+        uint256 coin_toss_seed = uint256(blockhash(block.number - 1));
+        
+        bytes memory payload = abi.encode(gamekey, coin_toss_seed);
 
-        require(games[gamekey].exists);
-
-        int8 result = l2_coin_toss(gamekey);
-
-        require(result == HEADS || result == TAILS);
-
-        address winner;
-        if (games[gamekey].players[msg.sender] == result) {
-            winner = msg.sender;
-        } else {
-            winner = opponent;
-        }
-
-        return winner;
+        // calls Cartesi's addInput to run the "coin toss" inside Cartesi Machine
+        IInput(L2_DAPP).addInput(payload);
     }
 
-    function l2_coin_toss(bytes memory gamekey) private returns (int8) {
-        // generate randomness using chainlink
-        // calls Cartesi's addInput to run the "game toss" inside Cartesi Machine
-        // must send to Rollups {"address1": coin_side, "address2": coin_side, "seed": randomness}
+    function announce_winner(address player1, address player2, address winner) public {
+        require(msg.sender == L2_DAPP && (winner == player1 || winner == player2));
+
+        bytes memory gamekey = get_gamekey(player1, player2);
+        Game storage game = games[gamekey].matches[games[gamekey].current_match_id];
+
+        require(game.exists);
+
+        emit GameResult(gamekey, games[gamekey].current_match_id, winner);
+        
+        game.winner = winner;
+        games[gamekey].current_match_id++;
     }
+
+    event GameResult (
+        bytes gamekey,
+        uint256 gameId,
+        address winner
+    );
 }

@@ -15,7 +15,7 @@ import logging
 import requests
 import json
 import random
-from enum import Enum
+from eth_abi import decode_abi, encode_abi
 
 logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
@@ -40,36 +40,32 @@ def toss_coin(seed):
     return random.randint(0,1)
 
 
-# {"address1": coin_side, "address2": coin_side, "seed": randomness}
 def handle_advance(data):
     logger.info(f"Received advance request data {data}")
 
-    payload_str = hex2str(data["payload"])
     status = "accept"
     try:
-        payload_json = json.loads(payload_str)
-        seed = payload_json.pop("seed")
+        binary = bytes.fromhex(data["payload"][2:])
 
-        if len(payload_json) != 2:
-            raise Exception(f"Payload should have the seed and the two players. Payload: {payload_json}")
+        # decode payload
+        gamekey, seed = decode_abi(['bytes', 'uint256'], binary)
+        player1, player2 = decode_abi(["address", "address"], gamekey)
 
         result = toss_coin(seed)
 
         winner = None
-        for player, coin_choice in d.items():
-            if result == coin_choice:
-                winner = player
-                break
-
-        if winner is None:
-            raise Exception(f"Invalid coin choices. {payload_json}")
-
-        notice = payload_json
-        notice["timestamp"] data["metadata"]["timestamp"]
-        notice["winner"] = winner
+        if result == 0:
+            winner = player1
+        else:
+            winner = player2
+        
+        notice = {
+            "timestamp": data["metadata"]["timestamp"],
+            "winner": winner
+        }
 
         response = requests.post(rollup_server + "/notice", json={"payload": str2hex(json.dumps(notice))})
-        logger.info(f"Received report status {response.status_code}")
+        logger.info(f"Received notice status {response.status_code}")
     except Exception as e:
         status = "reject"
         response = requests.post(rollup_server + "/report", json={"payload": str2hex(str(e))})
@@ -81,7 +77,7 @@ def handle_inspect(data):
     logger.info(f"Received inspect request data {data}")
     logger.info("Adding report")
 
-    inspect_response = "Coin Toss DApp, send a seed and both players address to run a game."
+    inspect_response = "Coin Toss DApp, send a seed and both players' addresses to run a game."
     inspect_response_hex = str2hex(inspect_response)
     response = requests.post(rollup_server + "/report", json={"payload": inspect_response_hex})
     logger.info(f"Received report status {response.status_code}")

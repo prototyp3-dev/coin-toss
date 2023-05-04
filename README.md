@@ -1,6 +1,6 @@
-# l1-l2-l1-cycle DApp
+# coin-toss DApp
 
-l1-l2-l1-cycle is a customized DApp written in Python, which originally resembles the one provided by the sample [Echo Python DApp](https://github.com/cartesi/rollups-examples/tree/main/echo-python).
+coin-toss is a customized DApp written in Python, which originally resembles the one provided by the sample [Echo Python DApp](https://github.com/cartesi/rollups-examples/tree/main/echo-python).
 Contrary to that example, this DApp does not use shared resources from the `rollups-examples` main directory, and as such the commands for building, running and deploying it are slightly different.
 
 The documentation below reflects the original application code, and should also be used as a basis for documenting any DApp created with this mechanism.
@@ -83,14 +83,14 @@ export RPC_URL=https://eth-goerli.alchemyapi.io/v2/<USER_KEY>
 With that in place, you can submit a deploy transaction to the Cartesi DApp Factory contract on the target network by executing the following command:
 
 ```shell
-DAPP_NAME=l1-l2-l1-cycle docker compose -f ./deploy-testnet.yml up
+DAPP_NAME=coin-toss docker compose -f ./deploy-testnet.yml up
 ```
 
-This will create a file at `./deployments/<network>/l1-l2-l1-cycle.json` with the deployed contract's address.
+This will create a file at `./deployments/<network>/coin-toss.json` with the deployed contract's address.
 Once the command finishes, it is advisable to stop the docker compose and remove the volumes created when executing it.
 
 ```shell
-DAPP_NAME=l1-l2-l1-cycle docker compose -f ./deploy-testnet.yml down -v
+DAPP_NAME=coin-toss docker compose -f ./deploy-testnet.yml down -v
 ```
 
 After that, a corresponding Cartesi Validator Node must also be instantiated in order to interact with the deployed smart contract on the target network and handle the back-end logic of the DApp.
@@ -124,7 +124,7 @@ export RPC_URL=<https://your.rpc.gateway>
 Then, inputs can be sent by specifying the DApp contract's address, as follows:
 
 ```shell
-yarn start input send --payload "Hello there" --addressFile path/to/l1-l2-l1-cycle/deployments/<network>/l1-l2-l1-cycle.json
+yarn start input send --payload "Hello there" --addressFile path/to/coin-toss/deployments/<network>/coin-toss.json
 ```
 
 Resulting notices can then be retrieved by querying the local Cartesi Node, as before:
@@ -151,7 +151,7 @@ In order to start the back-end, run the following commands in a dedicated termin
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
-ROLLUP_HTTP_SERVER_URL="http://127.0.0.1:5004" python3 l1-l2-l1-cycle.py
+ROLLUP_HTTP_SERVER_URL="http://127.0.0.1:5004" python3 coin-toss.py
 ```
 
 The final command will effectively run the back-end and send corresponding outputs to port `5004`.
@@ -160,7 +160,7 @@ It can optionally be configured in an IDE to allow interactive debugging using f
 You can also use a tool like [entr](https://eradman.com/entrproject/) to restart the back-end automatically when the code changes. For example:
 
 ```shell
-ls *.py | ROLLUP_HTTP_SERVER_URL="http://127.0.0.1:5004" entr -r python3 l1-l2-l1-cycle.py
+ls *.py | ROLLUP_HTTP_SERVER_URL="http://127.0.0.1:5004" entr -r python3 coin-toss.py
 ```
 
 After the back-end successfully starts, it should print an output like the following:
