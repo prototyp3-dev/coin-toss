@@ -16,11 +16,18 @@ import requests
 import json
 import random
 from eth_abi import decode_abi, encode_abi
+from Crypto.Hash import keccak
 
 logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
 
 rollup_server = environ["ROLLUP_HTTP_SERVER_URL"]
+coin_toss_addr = environ["COIN_TOSS_CONTRACT_ADDR"] # Layer-1 contract address
+
+k = keccak.new(digest_bits=256)
+k.update(b'announce_winner(address player1, address player2, address winner)')
+ANNOUNCE_WINNER_FUNCTION = k.digest()[:4] # first 4 bytes 
+
 logger.info(f"HTTP rollup_server url is {rollup_server}")
 
 def hex2str(hex):
@@ -34,6 +41,11 @@ def str2hex(str):
     Encodes a string as a hex string
     """
     return "0x" + str.encode("utf-8").hex()
+
+def post(endpoint, json):
+    response = requests.post(f"{rollup_server}/{endpoint}", json=json)
+    logger.info(f"Received {endpoint} status {response.status_code} body {response.content}")
+
 
 def toss_coin(seed):
     random.seed(seed)
@@ -64,12 +76,15 @@ def handle_advance(data):
             "winner": winner
         }
 
-        response = requests.post(rollup_server + "/notice", json={"payload": str2hex(json.dumps(notice))})
-        logger.info(f"Received notice status {response.status_code}")
+        post("notice", {"payload": str2hex(json.dumps(notice))})
+        
+        voucher_payload = ANNOUNCE_WINNER_FUNCTION + encode_abi(["address", "address", "address"], player1, player2, winner)
+        voucher = {"address": coin_toss_addr, "payload": "0x" + voucher_payload.hex()}
+        post("voucher", voucher)
+
     except Exception as e:
         status = "reject"
-        response = requests.post(rollup_server + "/report", json={"payload": str2hex(str(e))})
-        logger.info(f"Received report status {response.status_code} body {response.content}")
+        post("report", {"payload": str2hex(str(e))})
 
     return status
 
@@ -79,8 +94,7 @@ def handle_inspect(data):
 
     inspect_response = "Coin Toss DApp, send a seed and both players' addresses to run a game."
     inspect_response_hex = str2hex(inspect_response)
-    response = requests.post(rollup_server + "/report", json={"payload": inspect_response_hex})
-    logger.info(f"Received report status {response.status_code}")
+    post("report", {"payload": inspect_response_hex})
     return "accept"
 
 handlers = {

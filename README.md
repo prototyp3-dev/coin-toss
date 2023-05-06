@@ -151,7 +151,7 @@ In order to start the back-end, run the following commands in a dedicated termin
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
-ROLLUP_HTTP_SERVER_URL="http://127.0.0.1:5004" python3 coin-toss.py
+COIN_TOSS_CONTRACT_ADDR="0x67d269191c92Caf3cD7723F116c85e6E9bf55933" ROLLUP_HTTP_SERVER_URL="http://127.0.0.1:5004" python3 coin-toss.py
 ```
 
 The final command will effectively run the back-end and send corresponding outputs to port `5004`.

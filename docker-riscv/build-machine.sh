@@ -25,5 +25,6 @@ cartesi-machine \
     --rom-image=rom.bin \
     --store=$MACHINE_DIR \
     -- "cd /opt/cartesi/dapp; \
+        COIN_TOSS_CONTRACT_ADDR=\"0x67d269191c92Caf3cD7723F116c85e6E9bf55933\" \
         ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:$ROLLUP_HTTP_SERVER_PORT\" \
         ./entrypoint.sh"
