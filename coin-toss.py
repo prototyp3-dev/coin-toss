@@ -25,7 +25,7 @@ rollup_server = environ["ROLLUP_HTTP_SERVER_URL"]
 coin_toss_addr = environ["COIN_TOSS_CONTRACT_ADDR"] # Layer-1 contract address
 
 k = keccak.new(digest_bits=256)
-k.update(b'announce_winner(address player1, address player2, address winner)')
+k.update(b'announce_winner(address,address,address)')
 ANNOUNCE_WINNER_FUNCTION = k.digest()[:4] # first 4 bytes 
 
 logger.info(f"HTTP rollup_server url is {rollup_server}")
@@ -78,7 +78,7 @@ def handle_advance(data):
 
         post("notice", {"payload": str2hex(json.dumps(notice))})
         
-        voucher_payload = ANNOUNCE_WINNER_FUNCTION + encode_abi(["address", "address", "address"], player1, player2, winner)
+        voucher_payload = ANNOUNCE_WINNER_FUNCTION + encode_abi(["address", "address", "address"], [player1, player2, winner])
         voucher = {"address": coin_toss_addr, "payload": "0x" + voucher_payload.hex()}
         post("voucher", voucher)
 

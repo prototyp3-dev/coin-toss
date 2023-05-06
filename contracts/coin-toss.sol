@@ -19,7 +19,6 @@ contract CoinToss {
 
     mapping (bytes => Games) games; // maps gamekey to gameID
 
-    
     constructor() {
         deployer = msg.sender;
     }
