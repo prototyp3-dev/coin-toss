@@ -22,7 +22,6 @@ logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
 
 rollup_server = environ["ROLLUP_HTTP_SERVER_URL"]
-coin_toss_addr = environ["COIN_TOSS_CONTRACT_ADDR"] # Layer-1 contract address
 
 k = keccak.new(digest_bits=256)
 k.update(b'announce_winner(address,address,address)')
@@ -57,6 +56,8 @@ def handle_advance(data):
 
     status = "accept"
     try:
+        coin_toss_addr = data["metadata"]["msg_sender"]
+
         binary = bytes.fromhex(data["payload"][2:])
 
         # decode payload

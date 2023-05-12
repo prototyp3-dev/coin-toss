@@ -7,6 +7,7 @@ import "@chainlink/contracts/src/v0.8/VRFV2WrapperConsumerBase.sol";
 contract CoinToss is VRFV2WrapperConsumerBase {
     address deployer;
     address L2_DAPP;
+    Game public last_game;
         
     struct Game {
         address winner;
@@ -31,7 +32,7 @@ contract CoinToss is VRFV2WrapperConsumerBase {
     // this limit based on the network that you select, the size of the request,
     // and the processing of the callback request in the fulfillRandomWords()
     // function.
-    uint32 callbackGasLimit = 100000;
+    uint32 callbackGasLimit = 500000;
 
     // The default is 3, but you can set this higher.
     uint16 requestConfirmations = 3;
@@ -40,11 +41,11 @@ contract CoinToss is VRFV2WrapperConsumerBase {
     // Cannot exceed VRFV2Wrapper.getConfig().maxNumWords.
     uint32 numWords = 1;
 
-    // Address LINK - hardcoded for Sepolia
-    address constant linkAddress = 0x779877A7B0D9E8603169DdbD7836e478b4624789;
+    // Address LINK - hardcoded for Goerli
+    address constant linkAddress = 0x326C977E6efc84E512bB9C30f76E30c160eD06FB;
 
-    // address WRAPPER - hardcoded for Sepolia
-    address constant wrapperAddress = 0xab18414CD93297B0d12ac29E63Ca20f515b3DB46;
+    // address WRAPPER - hardcoded for Goerli
+    address constant wrapperAddress = 0x708701a1DfF4f478de54383E49a627eD4852C816;
 
     function l2_coin_toss(bytes memory gamekey) public returns (uint256 requestId) {
         requestId = requestRandomness(
@@ -102,6 +103,7 @@ contract CoinToss is VRFV2WrapperConsumerBase {
             game.exists = true;
         } else if (game.pending_player == msg.sender) {
             l2_coin_toss(gamekey);
+            game.pending_player = address(0);
         }        
     }
 
@@ -117,6 +119,8 @@ contract CoinToss is VRFV2WrapperConsumerBase {
         
         game.winner = winner;
         games[gamekey].current_match_id++;
+        
+        last_game = game;
     }
 
     event GameResult (

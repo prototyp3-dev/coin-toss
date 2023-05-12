@@ -1,0 +1,5 @@
+{
+  "fs": {
+    "files": ["coin-toss.py", "wallet.py", "entrypoint.sh"]
+  }
+}
