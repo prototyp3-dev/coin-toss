@@ -25,7 +25,7 @@ To interact with the DApp in testnet the following is also needed:
 
 ## Contracts
 
-The DApp uses only one smart contract, the different versions provided differ only in how the randomness is generated. The one in the local directory uses de block hash as randomness and is suitable for local tests (**Do not use such a thing in production**). The other uses [Chainlink](https://docs.chain.link/getting-started/conceptual-overview), an external network that provides trusted randomness for Blockchain. The approach using Chainlink needs different contracts for different networks since it has to request the randomness for a Chainlink contract deployed on the same network.
+The DApp uses only one smart contract, the different versions provided differ only in how the randomness is generated. The one in the local directory uses de block hash as randomness and is suitable for local tests (**Do not use such a thing in production**). The other uses [Chainlink](https://docs.chain.link/getting-started/conceptual-overview), an external network that provides trusted randomness for Blockchain. The approach using Chainlink needs different contracts for different networks since it has to request the randomness from a Chainlink contract deployed on the same network.
 
 ### Deploying Smart Contracts
 
