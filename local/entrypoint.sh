@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Copyright 2022 Cartesi Pte. Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -12,19 +12,5 @@
 # specific language governing permissions and limitations under the License.
 
 set -e
-
-MACHINE_DIR=$1
-ROLLUP_HTTP_SERVER_PORT=5004
-
-cartesi-machine \
-    --assert-rolling-template \
-    --ram-length=128Mi \
-    --rollup \
-    --flash-drive=label:root,filename:dapp.ext2 \
-    --ram-image=linux.bin \
-    --rom-image=rom.bin \
-    --store=$MACHINE_DIR \
-    -- "cd /opt/cartesi/dapp; \
-        COIN_TOSS_CONTRACT_ADDR=\"0x67d269191c92Caf3cD7723F116c85e6E9bf55933\" \
-        ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:$ROLLUP_HTTP_SERVER_PORT\" \
-        ./entrypoint.sh"
+export PATH="/opt/venv/bin:$PATH"
+rollup-init python3 coin-toss.py
