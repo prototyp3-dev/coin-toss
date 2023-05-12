@@ -23,6 +23,10 @@ services:
         "/opt/cartesi/share/dapp-bin/hash",
         "--outputFile",
         "/deployments/${NETWORK:?undefined NETWORK}/${DAPP_NAME:?undefined DAPP_NAME}.json",
+        "--inputDuration",
+        "300",
+        "--challengePeriod",
+        "300"
       ]
     volumes:
       - machine:/opt/cartesi/share/dapp-bin:ro
