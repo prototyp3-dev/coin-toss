@@ -58,7 +58,7 @@ def handle_advance(data):
     try:
         coin_toss_addr = data["metadata"]["msg_sender"]
 
-        binary = bytes.fromhex(data["payload"][2:])
+        binary = hex2str(data["payload"])
 
         # decode payload
         gamekey, seed = decode_abi(['bytes', 'uint256'], binary)
