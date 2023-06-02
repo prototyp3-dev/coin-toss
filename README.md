@@ -1,5 +1,9 @@
 # coin-toss DApp
 
+```
+Cartesi Rollups version: 0.8.x
+```
+
 This DApp is a coin toss game between two players. The purpose of this example is to illustrate the cycle of Layer-1 to Layer-2 to Layer-1 again. The smart contract in the contracts folder handles the game logic, and the Cartesi Machine is the game "engine" (coin toss). After the machine runs the game and decides on the winner, it generates a voucher to send the result back to Layer-1 when executed. The game workflow is as follows:
 
 1. The player calls the `play` method of the `coin-toss` contract passing his opponent's address to create a game.
