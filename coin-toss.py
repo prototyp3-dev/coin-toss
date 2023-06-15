@@ -25,15 +25,9 @@ rollup_server = environ["ROLLUP_HTTP_SERVER_URL"]
 
 k = keccak.new(digest_bits=256)
 k.update(b'announce_winner(address,address,address)')
-ANNOUNCE_WINNER_FUNCTION = k.digest()[:4] # first 4 bytes 
+ANNOUNCE_WINNER_FUNCTION = k.digest()[:4] # first 4 bytes
 
 logger.info(f"HTTP rollup_server url is {rollup_server}")
-
-def hex2str(hex):
-    """
-    Decodes a hex string into a regular string
-    """
-    return bytes.fromhex(hex[2:]).decode("utf-8")
 
 def str2hex(str):
     """
@@ -58,7 +52,7 @@ def handle_advance(data):
     try:
         coin_toss_addr = data["metadata"]["msg_sender"]
 
-        binary = hex2str(data["payload"])
+        binary = bytes.fromhex(data["payload"][2:])
 
         # decode payload
         gamekey, seed = decode_abi(['bytes', 'uint256'], binary)
@@ -71,14 +65,14 @@ def handle_advance(data):
             winner = player1
         else:
             winner = player2
-        
+
         notice = {
             "timestamp": data["metadata"]["timestamp"],
             "winner": winner
         }
 
         post("notice", {"payload": str2hex(json.dumps(notice))})
-        
+
         voucher_payload = ANNOUNCE_WINNER_FUNCTION + encode_abi(["address", "address", "address"], [player1, player2, winner])
         voucher = {"address": coin_toss_addr, "payload": "0x" + voucher_payload.hex()}
         post("voucher", voucher)
