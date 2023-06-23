@@ -1,7 +1,7 @@
 # syntax=docker.io/docker/dockerfile:1.4
 # layers for caching and versioning
-FROM cartesi/toolchain:0.13.0 as toolchain
-FROM cartesi/server-manager:0.6.0 as server-manager
+FROM cartesi/toolchain:0.14.0 as toolchain
+FROM cartesi/server-manager:0.7.0 as server-manager
 
 
 # stage to download dependencies
@@ -73,9 +73,16 @@ COPY --from=fs /dapp.ext2 ./dapp.ext2
 COPY --from=machine-core /opt/cartesi/share/rom.bin .
 COPY --from=machine-core /opt/cartesi/share/linux.bin .
 
+USER root
+
 # build machine
 COPY build-machine.sh /usr/local/bin
-RUN build-machine.sh /opt/cartesi/share/dapp-bin
+RUN mkdir /opt/cartesi/share/dapp-bin
+RUN build-machine.sh /opt/cartesi/share/dapp-bin/0_0
+RUN ln -s /opt/cartesi/share/dapp-bin/0_0 /opt/cartesi/share/dapp-bin/latest
+
+RUN chown --recursive cartesi:cartesi /opt/cartesi/share/dapp-bin
+#RUN chmod --recursive 666 /opt/cartesi/share/dapp-bin
 
 FROM server-manager as server-stage
 

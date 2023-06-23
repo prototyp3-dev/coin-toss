@@ -8,7 +8,7 @@ services:
       - machine:/opt/cartesi/share/dapp-bin
 
   deployer:
-    image: cartesi/rollups-cli:0.8.2
+    image: cartesi/rollups-cli:0.9.1
     depends_on:
       machine:
         condition: service_started
@@ -20,13 +20,9 @@ services:
         "--mnemonic",
         "${MNEMONIC:?undefined MNEMONIC}",
         "--templateHashFile",
-        "/opt/cartesi/share/dapp-bin/hash",
+        "/opt/cartesi/share/dapp-bin/latest/hash",
         "--outputFile",
         "/deployments/${NETWORK:?undefined NETWORK}/${DAPP_NAME:?undefined DAPP_NAME}.json",
-        "--inputDuration",
-        "300",
-        "--challengePeriod",
-        "300"
       ]
     volumes:
       - machine:/opt/cartesi/share/dapp-bin:ro

@@ -10,7 +10,7 @@ x-credentials: &postgres-config
 
 services:
   hardhat:
-    image: cartesi/rollups-hardhat:0.8.2
+    image: cartesi/rollups-hardhat:0.9.1
     command:
       [
         "node",
@@ -32,36 +32,15 @@ services:
       - blockchain-data:/opt/cartesi/share/blockchain
       - ./deployments:/app/rollups/deployments
 
-  rollups_dispatcher:
-    image: cartesi/rollups-dispatcher:0.8.2
-    command:
-      [
-        "--rd-dapp-contract-address-file",
-        "/deployments/localhost/dapp.json",
-        "--rd-initial-epoch",
-        "0",
-        "--sc-grpc-endpoint",
-        "http://state_server:50051",
-        "--sc-default-confirmations",
-        "1",
-        "--tx-provider-http-endpoint",
-        "http://hardhat:8545",
-        "--tx-mnemonic",
-        "test test test test test test test test test test test junk",
-        "--tx-chain-id",
-        "31337",
-        "--tx-chain-is-legacy",
-        "${TX_LEGACY:-false}",
-        "--tx-default-confirmations",
-        "2",
-        "--redis-endpoint",
-        "redis://redis:6379",
-      ]
+  dispatcher:
+    image: cartesi/rollups-dispatcher:0.9.1
     restart: always
     depends_on:
       hardhat:
         condition: service_healthy
       hardhat_set_interval:
+        condition: service_completed_successfully
+      deployer:
         condition: service_completed_successfully
       state_server:
         condition: service_healthy
@@ -69,24 +48,36 @@ services:
         condition: service_healthy
     environment:
       RUST_LOG: info
+
+      # https://github.com/cartesi/rollups/blob/main/offchain/dispatcher/src/config.rs#L54
+      RD_DAPP_DEPLOYMENT_FILE: /deployments/localhost/dapp.json
+      RD_ROLLUPS_DEPLOYMENT_FILE: /opt/cartesi/share/blockchain/localhost.json
+      RD_EPOCH_DURATION: 86400
+ 
+      SC_GRPC_ENDPOINT: http://state_server:50051
+      SC_DEFAULT_CONFIRMATIONS: 1
+
+      # https://github.com/cartesi/rollups/blob/main/offchain/dispatcher/src/sender.rs#L189
+      TX_PROVIDER_HTTP_ENDPOINT: http://hardhat:8545
+      
+      # https://github.com/cartesi/rollups/blob/main/offchain/dispatcher/src/signer/signer.rs#L63
+      TX_MNEMONIC: "test test test test test test test test test test test junk"      
+      TX_CHAIN_ID: 31337
+      
+      # ????
+      TX_CHAIN_IS_LEGACY: ${TX_LEGACY:-false}
+
+      # https://github.com/cartesi/rollups/blob/main/offchain/dispatcher/src/sender.rs#L206
+      TX_DEFAULT_CONFIRMATIONS: 2
+      
+      # https://github.com/cartesi/rollups/blob/495a12c5cfc3342b005dc82d9916f4b0536cff57/offchain/rollups-events/src/broker/mod.rs#L286
+      REDIS_ENDPOINT: redis://redis:6379
     volumes:
       - blockchain-data:/opt/cartesi/share/blockchain:ro
       - ./deployments:/deployments
 
   state_server:
-    image: cartesi/rollups-state-server:0.8.2
-    command: [
-        "--sf-genesis-block",
-        "0x1",
-        "--sf-safety-margin",
-        "1",
-        "--bh-http-endpoint",
-        "http://hardhat:8545",
-        "--bh-ws-endpoint",
-        "ws://hardhat:8545",
-        "--bh-block-timeout",
-        "8", # just a few seconds more than the configured automatic interval mining
-      ]
+    image: cartesi/rollups-state-server:0.9.1
     restart: always
     healthcheck:
       test: ["CMD", "grpc-health-probe", "-addr=:50051"]
@@ -96,26 +87,20 @@ services:
     depends_on:
       hardhat:
         condition: service_healthy
-    volumes:
-      - blockchain-data:/opt/cartesi/share/blockchain:ro
     environment:
       RUST_LOG: info
 
-  server_manager_broker_proxy:
-    image: cartesi/rollups-server-manager-broker-proxy:0.8.2
-    command:
-      [
-        "--chain-id",
-        "31337",
-        "--dapp-contract-address-file",
-        "/deployments/localhost/dapp.json",
-        "--redis-endpoint",
-        "redis://redis:6379",
-        "--server-manager-endpoint",
-        "http://server_manager:5001",
-        "--session-id",
-        "default_rollups_id",
-      ]
+      # https://github.com/cartesi/rollups/blob/main/offchain/state-server/src/lib.rs#L100
+      SF_GENESIS_BLOCK: 0x1
+      SF_SAFETY_MARGIN: 1
+
+      # https://github.com/cartesi/rollups/blob/main/offchain/state-server/src/lib.rs#L118
+      BH_HTTP_ENDPOINT: http://hardhat:8545
+      BH_WS_ENDPOINT: ws://hardhat:8545
+      BH_BLOCK_TIMEOUT: 8
+  
+  advance_runner:
+    image: cartesi/rollups-advance-runner:0.9.1
     restart: always
     healthcheck:
       test: ["CMD", "curl", "--fail", "localhost:8080/healthz"]
@@ -130,16 +115,32 @@ services:
       deployer:
         condition: service_completed_successfully
     volumes:
-      - ./deployments:/deployments
+      - ./deployments:/deployments:ro
+      - machine:/opt/cartesi/share/dapp-bin
     environment:
       RUST_LOG: info
+      
+      # https://github.com/cartesi/rollups/blob/495a12c5cfc3342b005dc82d9916f4b0536cff57/offchain/advance-runner/src/server_manager/config.rs#L21
+      SERVER_MANAGER_ENDPOINT: http://server_manager:5001
+      SESSION_ID: default_rollups_id
+      
+      # https://github.com/cartesi/rollups/blob/main/offchain/rollups-events/src/broker/mod.rs#L286
+      REDIS_ENDPOINT: redis://redis:6379
 
+      # https://github.com/cartesi/rollups/blob/main/offchain/rollups-events/src/rollups_stream.rs#L20
+      CHAIN_ID: 31337
+      DAPP_CONTRACT_ADDRESS_FILE: /deployments/localhost/dapp.json
+      
+      # https://github.com/cartesi/rollups/blob/main/offchain/advance-runner/src/snapshot/config.rs#L24
+      SNAPSHOT_DIR: /opt/cartesi/share/dapp-bin
+      SNAPSHOT_LATEST: /opt/cartesi/share/dapp-bin/latest
+  
   server_manager:
     restart: always
     ports:
       - "5001:5001"
     healthcheck:
-      test: ["CMD", "grpc-health-probe", "-addr=:5001"]
+      test: ["CMD-SHELL","bash -c 'echo \"\" > /dev/tcp/127.0.0.1/5001;'"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -150,7 +151,7 @@ services:
       - REMOTE_CARTESI_MACHINE_LOG_LEVEL=info
 
   deployer:
-    image: cartesi/rollups-cli:0.8.2
+    image: cartesi/rollups-cli:0.9.1
     restart: on-failure
     depends_on:
       hardhat:
@@ -167,7 +168,7 @@ services:
         "--mnemonic",
         "test test test test test test test test test test test junk",
         "--templateHashFile",
-        "/opt/cartesi/share/dapp-bin/hash",
+        "/opt/cartesi/share/dapp-bin/0_0/hash",
         "--outputFile",
         "/deployments/localhost/dapp.json",
       ]
@@ -206,17 +207,8 @@ services:
         "http://hardhat:8545",
       ]
 
-  rollups_inspect_server:
-    image: cartesi/rollups-inspect-server:0.8.2
-    command:
-      [
-        "--inspect-server-address",
-        "0.0.0.0:5005",
-        "--server-manager-address",
-        "server_manager:5001",
-        "--session-id",
-        "default_rollups_id",
-      ]
+  inspect_server:
+    image: cartesi/rollups-inspect-server:0.9.1
     restart: always
     ports:
       - "5005:5005"
@@ -225,47 +217,31 @@ services:
         condition: service_healthy
     environment:
       RUST_LOG: info
+      INSPECT_SERVER_ADDRESS: 0.0.0.0:5005
+      SERVER_MANAGER_ADDRESS: server_manager:5001
+      SESSION_ID: default_rollups_id
 
-  rollups_indexer:
-    image: cartesi/rollups-indexer:0.8.2
-    command:
-      [
-        "--dapp-contract-address-file",
-        "/deployments/localhost/dapp.json",
-        "--session-id",
-        "default_rollups_id",
-        "--initial-epoch",
-        "0",
-        "--interval",
-        "10",
-        "--confirmations",
-        "1",
-        "--state-server-endpoint",
-        "http://state_server:50051",
-        "--mm-endpoint",
-        "http://server_manager:5001",
-      ]
+  indexer:
+    image: cartesi/rollups-indexer:0.9.1
     restart: always
     depends_on:
-      hardhat:
-        condition: service_healthy
-      hardhat_set_interval:
-        condition: service_completed_successfully
-      state_server:
-        condition: service_healthy
-      server_manager:
-        condition: service_healthy
       database:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+      deployer:
+        condition: service_completed_successfully
     environment:
       <<: *postgres-config
       RUST_LOG: info
+      REDIS_ENDPOINT: redis://redis:6379
+      CHAIN_ID: 31337
+      DAPP_CONTRACT_ADDRESS_FILE: /deployments/localhost/dapp.json
     volumes:
-      - blockchain-data:/opt/cartesi/share/blockchain
-      - ./deployments:/deployments
-
-  query_server:
-    image: cartesi/query-server:0.8.2
+      - ./deployments:/deployments:ro
+  
+  graphql_server:
+    image: cartesi/rollups-graphql-server:0.9.1
     ports:
       - "4000:4000"
     depends_on:

@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.0 <0.9.0;
 
-import "@cartesi/rollups/contracts/interfaces/IInput.sol";
+import "@cartesi/rollups/contracts/inputs/IInputBox.sol";
 
 contract CoinToss {
     address deployer;
     address L2_DAPP;
     Game public last_game;
+    IInputBox inputBox = IInputBox(0x5a723220579C0DCb8C9253E6b4c62e572E379945);
 
     struct Game {
         address winner;
@@ -67,7 +68,7 @@ contract CoinToss {
         bytes memory payload = abi.encode(gamekey, coin_toss_seed);
 
         // calls Cartesi's addInput to run the "coin toss" inside Cartesi Machine
-        IInput(L2_DAPP).addInput(payload);
+        inputBox.addInput(L2_DAPP, payload);
     }
 
     function announce_winner(address player1, address player2, address winner) public {
