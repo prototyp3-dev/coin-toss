@@ -74,7 +74,7 @@ def handle_advance(data):
         post("notice", {"payload": str2hex(json.dumps(notice))})
 
         voucher_payload = ANNOUNCE_WINNER_FUNCTION + encode_abi(["address", "address", "address"], [player1, player2, winner])
-        voucher = {"address": coin_toss_addr, "payload": "0x" + voucher_payload.hex()}
+        voucher = {"destination": coin_toss_addr, "payload": "0x" + voucher_payload.hex()}
         post("voucher", voucher)
 
     except Exception as e:
@@ -108,12 +108,5 @@ while True:
         logger.info("No pending rollup request, trying again")
     else:
         rollup_request = response.json()
-        data = rollup_request["data"]
-        if "metadata" in data:
-            metadata = data["metadata"]
-            if metadata["epoch_index"] == 0 and metadata["input_index"] == 0:
-                rollup_address = metadata["msg_sender"]
-                logger.info(f"Captured rollup address: {rollup_address}")
-                continue
         handler = handlers[rollup_request["request_type"]]
         finish["status"] = handler(rollup_request["data"])

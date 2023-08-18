@@ -8,7 +8,7 @@ contract CoinToss is VRFV2WrapperConsumerBase {
     address deployer;
     address L2_DAPP;
     Game public last_game;
-        
+
     struct Game {
         address winner;
         address pending_player;
@@ -63,7 +63,7 @@ contract CoinToss is VRFV2WrapperConsumerBase {
 
         uint256 coin_toss_seed = _randomWords[0];
         bytes memory payload = abi.encode(gamekey, coin_toss_seed);
-        
+
         // calls Cartesi's addInput to run the "coin toss" inside Cartesi Machine
         IInput(L2_DAPP).addInput(payload);
     }
@@ -95,7 +95,7 @@ contract CoinToss is VRFV2WrapperConsumerBase {
 
         bytes memory gamekey = get_gamekey(msg.sender, opponent);
         Game storage game = games[gamekey].matches[games[gamekey].current_match_id];
-        
+
         require(!game.exists || game.pending_player == msg.sender);
 
         if (!game.exists) {
@@ -104,7 +104,7 @@ contract CoinToss is VRFV2WrapperConsumerBase {
         } else if (game.pending_player == msg.sender) {
             l2_coin_toss(gamekey);
             game.pending_player = address(0);
-        }        
+        }
     }
 
     function announce_winner(address player1, address player2, address winner) public {
@@ -116,10 +116,10 @@ contract CoinToss is VRFV2WrapperConsumerBase {
         require(game.exists);
 
         emit GameResult(gamekey, games[gamekey].current_match_id, winner);
-        
+
         game.winner = winner;
         games[gamekey].current_match_id++;
-        
+
         last_game = game;
     }
 
