@@ -26,7 +26,7 @@ services:
       - RPC_URL=${RPC_URL:?undefined RPC_URL}
 
   dapp-deployer:
-    build: ./build/testnet-dapp-deployer
+    build: ./testnet-dapp-deployer
     depends_on:
       machine:
         condition: service_started
