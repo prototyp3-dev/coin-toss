@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.0 <0.9.0;
 
-import "@cartesi/rollups@1.0.0-rc.2/contracts/inputs/IInputBox.sol";
+import "@cartesi/rollups/contracts/inputs/IInputBox.sol";
 
 contract CoinToss {
     address deployer;
@@ -25,7 +25,7 @@ contract CoinToss {
     constructor() {
         deployer = msg.sender;
     }
-    
+
     function set_dapp_address(address l2_dapp) public {
         require(msg.sender == deployer);
 
@@ -49,7 +49,7 @@ contract CoinToss {
 
         bytes memory gamekey = get_gamekey(msg.sender, opponent);
         Game storage game = games[gamekey].matches[games[gamekey].current_match_id];
-        
+
         require(!game.exists || game.pending_player == msg.sender);
 
         if (!game.exists) {
@@ -58,13 +58,13 @@ contract CoinToss {
         } else if (game.pending_player == msg.sender) {
             l2_coin_toss(gamekey);
             game.pending_player = address(0);
-        }        
+        }
     }
 
     function l2_coin_toss(bytes memory gamekey) private {
         // generate randomness
         uint256 coin_toss_seed = uint256(blockhash(block.number - 1));
-        
+
         bytes memory payload = abi.encode(gamekey, coin_toss_seed);
 
         // calls Cartesi's addInput to run the "coin toss" inside Cartesi Machine
@@ -80,7 +80,7 @@ contract CoinToss {
         require(game.exists);
 
         emit GameResult(gamekey, games[gamekey].current_match_id, winner);
-        
+
         game.winner = winner;
         games[gamekey].current_match_id++;
 

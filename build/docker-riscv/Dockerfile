@@ -1,8 +1,8 @@
 # syntax=docker.io/docker/dockerfile:1.4
 # layers for caching and versioning
-FROM cartesi/toolchain:0.14.0 as toolchain
-FROM cartesi/server-manager:0.7.0 as server-manager
-FROM cartesi/rollups-hardhat:0.9.1 as rollups-hardhat
+FROM cartesi/toolchain:0.15.0 as toolchain
+FROM cartesi/server-manager:0.8.2 as server-manager
+FROM cartesi/rollups-hardhat:1.0.0 as rollups-hardhat
 
 
 # stage to download dependencies
@@ -21,7 +21,7 @@ FROM rollups-hardhat AS local-deployments-stage
 
 ARG NETWORK=localhost
 
-RUN <<EOF
+RUN <<EOF 
 if [ "$NETWORK" = "localhost" ] ; then
     echo "Add localhost deployments"
     sh -c "npx hardhat deploy --write true --network hardhat"
@@ -39,7 +39,7 @@ FROM busybox as deployments-stage
 
 WORKDIR /opt/cartesi/share
 COPY --from=machine-core opt/cartesi/share/rollups.tgz ./
-RUN tar -xzvf ./rollups.tgz
+RUN tar -xzvf ./rollups.tgz 
 
 # stage to wrap the dapp installing resources needed to run inside the Cartesi Machine
 FROM dapp as wrapped-stage
@@ -73,7 +73,7 @@ COPY --from=machine-core /opt/cartesi/share/machine-emulator-tools.tar.gz /var/t
 RUN tar -xvf machine-emulator-tools.tar.gz ./
 RUN rm machine-emulator-tools.tar.gz
 
-#add deployments
+#add deployments 
 COPY --from=deployments /opt/cartesi/share/package/deployments* /var/tmp/dapp_fs/opt/cartesi/dapp/deployments/
 COPY --from=local-deployments /app/rollups/deployments/hardhat/* /var/tmp/dapp_fs/opt/cartesi/dapp/deployments/localhost/
 

@@ -19,29 +19,9 @@ This DApp is a coin toss game between two players. The purpose of this example i
 
 ^^^ When executed, the voucher triggers the `announce_winner` function of the `coin-toss` contract. This function updates the structure that stores the game, emits a `GameResult` event, and increments the game counter for the players. In case they decide to start a new game.
 
-
-## Requirements
-
-Please refer to the [rollups-examples requirements](https://github.com/cartesi/rollups-examples/tree/main/README.md#requirements).
-
-To interact with the DApp in testnet the following is also needed:
-1. [Metamask Plugin](https://metamask.io/)
-
 ## Contracts
 
-The DApp uses only one smart contract, the different versions provided differ only in how the randomness is generated. The one in the local directory uses de block hash as randomness and is suitable for local tests (**Do not use such a thing in production**). The other uses [Chainlink](https://docs.chain.link/getting-started/conceptual-overview), an external network that provides trusted randomness for Blockchain. The approach using Chainlink needs different contracts for different networks since it has to request the randomness from a Chainlink contract deployed on the same network.
-
-### Deploying Smart Contracts
-
-The easiest way to deploy a smart contract is through the [Remix IDE](https://remix.ethereum.org), so the proceedings are:
-
-1. Creat a `coin-toss.sol` in the contracts directory of the Remix IDE worspace.
-2. Copy the choosen smart contract code and paste it into the one created in the Remix IDE workspace.
-3. Compile the contract (Ctrl + s).
-4. Click on the Tab "Deploy & run transactions".
-5. Select the environment/network you want to deploy.
-    1. If you are running locally, make sure to run the `docker compose` command first to bring up the test environment.
-6. Click on `deploy`.
+The DApp uses only one smart contract, the different versions provided differ only in how the randomness is generated. The one in the localhost directory uses de block hash as randomness and is suitable for local tests (**Do not use such a thing in production**). The other uses [Chainlink](https://docs.chain.link/getting-started/conceptual-overview), an external network that provides trusted randomness for Blockchain. The approach using Chainlink needs different contracts for different networks since it has to request the randomness from a Chainlink contract deployed on the same network.
 
 ## Building
 
@@ -72,7 +52,7 @@ Deploying a new Cartesi DApp to a blockchain requires creating a smart contract 
 The first step is to build the DApp's back-end machine, which will produce a hash that serves as a unique identifier.
 
 ```shell
-docker buildx bake -f docker-bake.hcl -f docker-bake.override.hcl machine --load
+docker buildx bake -f docker-bake.hcl -f docker-bake.override.hcl machine --load --set *.args.NETWORK=sepolia
 ```
 
 Once the machine docker image is ready, we can use it to deploy a corresponding Rollups smart contract.
@@ -99,7 +79,7 @@ DAPP_NAME="coin-toss" docker compose --env-file env.<network> -f deploy-testnet.
 Here, `env.<network>` specifies general parameters for the target network, like its name and chain ID. In the case of Goerli, the command would be:
 
 ```shell
-DAPP_NAME="coin-toss" docker compose --env-file env.goerli -f deploy-testnet.yml up
+DAPP_NAME="coin-toss" docker compose --env-file env.sepolia -f deploy-testnet.yml up
 ```
 
 This will create a file at `deployments/<network>/coin-toss.json` with the deployed contract's address.
@@ -121,13 +101,13 @@ export WSS_URL=wss://eth-goerli.alchemyapi.io/v2/<USER_KEY>
 Then, the node itself can be started by running a docker compose as follows:
 
 ```shell
-DAPP_NAME="coin-toss" docker compose --env-file env.<network> -f docker-compose-testnet.yml -f docker-compose.override.yml up
+DAPP_NAME="coin-toss" docker compose --env-file env.<network> -f docker-compose-testnet.yml up
 ```
 
 Alternatively, you can also run the node on host mode by executing:
 
 ```shell
-DAPP_NAME="coin-toss" docker compose --env-file env.<network> -f docker-compose-testnet.yml -f docker-compose.override.yml -f docker-compose-host-testnet.yml up
+DAPP_NAME="coin-toss" docker compose --env-file env.<network> -f docker-compose-testnet.yml -f docker-compose-host-testnet.yml up
 ```
 
 ## Running the back-end in host mode
@@ -172,17 +152,50 @@ After that, you can interact with the application normally [as explained above](
 
 ## Interacting with the DApp
 
-After the `coin-toss` contract was deployed and the Cartesi Node is running the application is ready and users can finally interact with it. The procedure for interacting is as follows:
+Before beginning the interaction, declare the variables that we will be using. So first, go to a separate terminal window and execute the commands below to initialize the variables.
 
-1. On Remix IDE, execute the `set_dapp_address` method of the `coin-toss` contract to set the rollup contract address. This step is to allow the layer-1 contract to send inputs to the Cartesi Rollups.
+> [!IMPORTANT]
+> The values used through this interaction consider that the example is running locally. The contracts addresses can be found in the `deployments`.
+
+```shell
+export PLAYER1="0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+export PLAYER1_PRIVATE_KEY="0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+export PLAYER2="0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+export PLAYER2_PRIVATE_KEY="0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"
+export COIN_TOSS_ADDRESS="0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1"
+export DAPP_ADDRESS="0x70ac08179605AF2D9e75782b8DEcDD3c22aA4D0C"
+export RPC_URL="http://localhost:8545"
+```
+
+> [!NOTE]
+> The image `ghcr.io/foundry-rs/foundry` its from [Foundry](https://book.getfoundry.sh/getting-started/installation) and allow us to use the [cast](https://book.getfoundry.sh/reference/cast/cast) command to send transactions.
+
+1. Execute the `set_dapp_address` method of the `coin-toss` contract to set the rollup contract address. This step is to allow the layer-1 contract to send inputs to the Cartesi Rollups DApp.
+
+```shell
+docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"set_dapp_address(address)\" $DAPP_ADDRESS"
+```
+
 2. Execute the `play` method passing the opponent's address to challenge him for a coin toss game.
+
+```shell
+docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"play(address)\" $PLAYER2"
+```
+
 3. The challenged player executes the same `play` method passing the challenger address. The input is then fetched by the Cartesi Node the coin toss is executed inside the Cartesi Machine. A notice and a voucher are generated.
+
+```shell
+docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER2_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"play(address)\" $PLAYER1"
+```
+
 4. (Optional) Check the notice and the voucher using the [frontend-console](https://github.com/cartesi/rollups-examples/tree/main/frontend-console).
-5. Wait for the dispute period to end to execute the voucher. The dispute period is set to 5 minutes in testnet^, as can be seen in `deploy-testnet.yml`. If running locally advance the time with the following command:
+5. Wait for the dispute period to end to execute the voucher. The dispute period is set to 5 minutes in testnet^, as can be seen in `docker-compose-testnet.yml`. If running locally advance the time with the following command:
+
 ```shell
 curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[864010]}' http://localhost:8545
 ```
+
 6. Execute the voucher using the `frontend-console`.
 7. (Optional) Check the value of the `last_game` variable in the `coin-toss` smart contract to see the persisted result in layer-1 due to the voucher execution.
 
-^ **This value was chosen for testing purposes, do not use it in production!!!** The default value is 1 week.
+^ **The value was chosen for testing purposes, do not use it in production!!!** The default value is 1 week.
