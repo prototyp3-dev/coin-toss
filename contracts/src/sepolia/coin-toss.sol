@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.0 <0.9.0;
 
-import "@cartesi/rollups/contracts/interfaces/IInput.sol";
-import "@chainlink/contracts/src/v0.8/VRFV2WrapperConsumerBase.sol";
+import "@cartesi/rollups/contracts/inputs/IInputBox.sol";
+import "@chainlink/contracts/src/v0.8/vrf/VRFV2WrapperConsumerBase.sol";
 
 contract CoinToss is VRFV2WrapperConsumerBase {
     address deployer;
-    address L2_DAPP;
+    address public L2_DAPP;
     Game public last_game;
-        
+    IInputBox inputBox = IInputBox(0x59b22D57D4f067708AB0c00552767405926dc768);
+
     struct Game {
         address winner;
         address pending_player;
@@ -41,13 +42,13 @@ contract CoinToss is VRFV2WrapperConsumerBase {
     // Cannot exceed VRFV2Wrapper.getConfig().maxNumWords.
     uint32 numWords = 1;
 
-    // Address LINK - hardcoded for Goerli
-    address constant linkAddress = 0x326C977E6efc84E512bB9C30f76E30c160eD06FB;
+    // Address LINK - hardcoded for Sepolia
+    address constant linkAddress = 0x779877A7B0D9E8603169DdbD7836e478b4624789;
 
-    // address WRAPPER - hardcoded for Goerli
-    address constant wrapperAddress = 0x708701a1DfF4f478de54383E49a627eD4852C816;
+    // address WRAPPER - hardcoded for Sepolia
+    address constant wrapperAddress = 0xab18414CD93297B0d12ac29E63Ca20f515b3DB46;
 
-    function l2_coin_toss(bytes memory gamekey) public returns (uint256 requestId) {
+    function l2_coin_toss(bytes memory gamekey) private returns (uint256 requestId) {
         requestId = requestRandomness(
             callbackGasLimit,
             requestConfirmations,
@@ -63,9 +64,9 @@ contract CoinToss is VRFV2WrapperConsumerBase {
 
         uint256 coin_toss_seed = _randomWords[0];
         bytes memory payload = abi.encode(gamekey, coin_toss_seed);
-        
+
         // calls Cartesi's addInput to run the "coin toss" inside Cartesi Machine
-        IInput(L2_DAPP).addInput(payload);
+        inputBox.addInput(L2_DAPP, payload);
     }
 
     constructor() VRFV2WrapperConsumerBase(linkAddress, wrapperAddress) {
@@ -95,7 +96,7 @@ contract CoinToss is VRFV2WrapperConsumerBase {
 
         bytes memory gamekey = get_gamekey(msg.sender, opponent);
         Game storage game = games[gamekey].matches[games[gamekey].current_match_id];
-        
+
         require(!game.exists || game.pending_player == msg.sender);
 
         if (!game.exists) {
@@ -104,7 +105,7 @@ contract CoinToss is VRFV2WrapperConsumerBase {
         } else if (game.pending_player == msg.sender) {
             l2_coin_toss(gamekey);
             game.pending_player = address(0);
-        }        
+        }
     }
 
     function announce_winner(address player1, address player2, address winner) public {
@@ -116,10 +117,10 @@ contract CoinToss is VRFV2WrapperConsumerBase {
         require(game.exists);
 
         emit GameResult(gamekey, games[gamekey].current_match_id, winner);
-        
+
         game.winner = winner;
         games[gamekey].current_match_id++;
-        
+
         last_game = game;
     }
 
