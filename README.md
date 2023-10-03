@@ -199,6 +199,10 @@ curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[86
 ```
 
 6. Execute the voucher using the `frontend-console`.
+```shell
+yarn start voucher execute --index 0 --input 0
+```
+
 7. Check the value of the `last_game` variable in the `CoinToss` smart contract to see the persisted result in layer-1 due to the voucher execution.
 
 ```shell

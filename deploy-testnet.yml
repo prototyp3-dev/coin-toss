@@ -9,7 +9,11 @@ services:
 
   contracts:
     build: ./contracts
-    command: ["mkdir -p deployments/${NETWORK:?undefined NETWORK} && forge create --rpc-url '${RPC_URL:?undefined RPC_URL}' --mnemonic '${MNEMONIC:?undefined MNEMONIC}' --json /opt/contracts/src/${NETWORK:?undefined NETWORK}/coin-toss.sol:CoinToss | tee deployments/${NETWORK:?undefined NETWORK}/CoinToss.json"]
+    environment:
+      - CONTRACTS=CoinToss
+      - MNEMONIC=${MNEMONIC:?undefined MNEMONIC}
+      - RPC_URL=${RPC_URL:?undefined RPC_URL}
+      - NETWORK=${NETWORK:?undefined NETWORK}
     volumes:
       - ./deployments:/opt/contracts/deployments
 
