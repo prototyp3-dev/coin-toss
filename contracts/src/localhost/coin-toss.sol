@@ -3,7 +3,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "@cartesi/rollups/contracts/inputs/IInputBox.sol";
 
-contract CoinToss {
+contract TrustAndTeach {
     address deployer;
     address public L2_DAPP;
     Game public last_game;
