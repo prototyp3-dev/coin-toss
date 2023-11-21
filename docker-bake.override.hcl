@@ -11,13 +11,13 @@ variable "DOCKER_ORGANIZATION" {
 }
 
 target "server" {
-  tags = ["${DOCKER_ORGANIZATION}/dapp:coin-toss-${TAG}-server"]
+  tags = ["${DOCKER_ORGANIZATION}/dapp:trust-and-teach-${TAG}-server"]
 }
 
 target "console" {
-  tags = ["${DOCKER_ORGANIZATION}/dapp:coin-toss-${TAG}-console"]
+  tags = ["${DOCKER_ORGANIZATION}/dapp:trust-and-teach-${TAG}-console"]
 }
 
 target "machine" {
-  tags = ["${DOCKER_ORGANIZATION}/dapp:coin-toss-${TAG}-machine"]
+  tags = ["${DOCKER_ORGANIZATION}/dapp:trust-and-teach-${TAG}-machine"]
 }

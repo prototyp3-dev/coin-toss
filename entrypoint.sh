@@ -13,4 +13,4 @@
 
 set -e
 export PATH="/opt/venv/bin:$PATH"
-rollup-init python3 coin-toss.py
+rollup-init python3 trust-and-teach.py
