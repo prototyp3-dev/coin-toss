@@ -17,10 +17,10 @@ contract TrustAndTeach {
 
     struct Games {
         uint256 current_match_id; // initial value is 0
-        mapping (uint => Game) matches;
+        mapping(uint256 => Game) matches;
     }
 
-    mapping (bytes => Games) games; // maps gamekey to gameID
+    mapping(bytes => Games) games; // maps gamekey to gameID
 
     constructor() {
         deployer = msg.sender;
@@ -32,7 +32,11 @@ contract TrustAndTeach {
         L2_DAPP = l2_dapp;
     }
 
-    function get_gamekey(address player, address opponent) internal pure returns (bytes memory) {
+    function get_gamekey(address player, address opponent)
+        internal
+        pure
+        returns (bytes memory)
+    {
         bytes memory gamekey;
         if (player < opponent) {
             gamekey = abi.encode(player, opponent);
@@ -44,11 +48,13 @@ contract TrustAndTeach {
     }
 
     // used to create or play game between two players
-    function play(address opponent) public {
+    function play(address opponent, string memory prompt) public {
         require(L2_DAPP != address(0));
 
         bytes memory gamekey = get_gamekey(msg.sender, opponent);
-        Game storage game = games[gamekey].matches[games[gamekey].current_match_id];
+        Game storage game = games[gamekey].matches[
+            games[gamekey].current_match_id
+        ];
 
         require(!game.exists || game.pending_player == msg.sender);
 
@@ -61,21 +67,29 @@ contract TrustAndTeach {
         }
     }
 
-    function l2_coin_toss(bytes memory gamekey) private {
+    function l2_coin_toss(bytes memory gamekey, string memory prompt) private {
         // generate randomness
         uint256 coin_toss_seed = uint256(blockhash(block.number - 1));
 
-        bytes memory payload = abi.encode(gamekey, coin_toss_seed);
+        bytes memory payload = abi.encode(gamekey, coin_toss_seed, string memory prompt);
 
         // calls Cartesi's addInput to run the "coin toss" inside Cartesi Machine
         inputBox.addInput(L2_DAPP, payload);
     }
 
-    function announce_winner(address player1, address player2, address winner) public {
-        require(msg.sender == L2_DAPP && (winner == player1 || winner == player2));
+    function announce_winner(
+        address player1,
+        address player2,
+        address winner
+    ) public {
+        require(
+            msg.sender == L2_DAPP && (winner == player1 || winner == player2)
+        );
 
         bytes memory gamekey = get_gamekey(player1, player2);
-        Game storage game = games[gamekey].matches[games[gamekey].current_match_id];
+        Game storage game = games[gamekey].matches[
+            games[gamekey].current_match_id
+        ];
 
         require(game.exists);
 
@@ -87,9 +101,5 @@ contract TrustAndTeach {
         last_game = game;
     }
 
-    event GameResult (
-        bytes gamekey,
-        uint256 gameId,
-        address winner
-    );
+    event GameResult(bytes gamekey, uint256 gameId, address winner);
 }

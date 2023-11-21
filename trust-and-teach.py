@@ -60,7 +60,7 @@ def handle_advance(data):
         binary = bytes.fromhex(data["payload"][2:])
 
         # decode payload
-        gamekey, seed = decode_abi(['bytes', 'uint256'], binary)
+        gamekey, seed, prompt = decode_abi(['bytes', 'uint256','string'], binary)
         player1, player2 = decode_abi(["address", "address"], gamekey)
 
         result = toss_coin(seed)
@@ -73,7 +73,8 @@ def handle_advance(data):
 
         notice = {
             "timestamp": data["metadata"]["timestamp"],
-            "winner": winner
+            "winner": winner,
+            "prompt": prompt
         }
 
         post("notice", {"payload": str2hex(json.dumps(notice))})
