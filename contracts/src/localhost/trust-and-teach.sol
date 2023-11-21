@@ -71,7 +71,7 @@ contract TrustAndTeach {
         // generate randomness
         uint256 coin_toss_seed = uint256(blockhash(block.number - 1));
 
-        bytes memory payload = abi.encode(gamekey, coin_toss_seed, string memory prompt);
+        bytes memory payload = abi.encode(gamekey, coin_toss_seed, prompt);
 
         // calls Cartesi's addInput to run the "coin toss" inside Cartesi Machine
         inputBox.addInput(L2_DAPP, payload);
