@@ -62,7 +62,7 @@ contract TrustAndTeach {
             game.pending_player = opponent;
             game.exists = true;
         } else if (game.pending_player == msg.sender) {
-            l2_coin_toss(gamekey);
+            l2_coin_toss(gamekey, prompt);
             game.pending_player = address(0);
         }
     }
