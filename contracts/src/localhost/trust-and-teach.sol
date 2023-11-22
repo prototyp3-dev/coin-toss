@@ -22,6 +22,19 @@ contract TrustAndTeach {
 
     mapping(bytes => Games) games; // maps gamekey to gameID
 
+    struct Conversation {
+        address author;
+        string prompt;
+        string[] responses;
+        uint256[] ranks; // most relevent is 0
+        uint256 createInstructionTimestamp;
+        uint256 responseAnnouncedTimestamp;
+        uint256 rankingTimestamp;
+    }
+
+    uint256 public current_conversation_id = 0; // initial value is 0
+    mapping(uint256 => Conversation) conversations;
+
     constructor() {
         deployer = msg.sender;
     }
@@ -51,7 +64,16 @@ contract TrustAndTeach {
     function sendInstructionPrompt(address opponent, string memory prompt)
         public
     {
-        require(L2_DAPP != address(0));
+        // require(L2_DAPP != address(0));
+        Conversation storage conversation = conversations[
+            current_conversation_id
+        ];
+        conversation.author = msg.sender;
+        conversation.prompt = prompt;
+        conversation.createInstructionTimestamp = block.timestamp;
+        // cartesiSubmitPrompt(current_conversation_id, prompt);
+        emit PromptSent(current_conversation_id, prompt);
+        current_conversation_id++;
 
         bytes memory gamekey = get_gamekey(msg.sender, opponent);
         Game storage game = games[gamekey].matches[
@@ -104,4 +126,7 @@ contract TrustAndTeach {
     }
 
     event GameResult(bytes gamekey, uint256 gameId, address winner);
+    event PromptSent(uint256 conversation_id, string prompt);
+    event PromptResponseAnnounced(uint256 conversation_id, string[] responses);
+    event PromptResponsesRanked(uint256 conversation_id, uint256[] ranks);
 }
