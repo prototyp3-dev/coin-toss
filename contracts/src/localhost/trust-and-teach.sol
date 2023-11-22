@@ -6,6 +6,8 @@ import "@cartesi/rollups/contracts/inputs/IInputBox.sol";
 contract TrustAndTeach {
     address deployer;
     address public L2_DAPP;
+    string public license = "MIT";
+    string public llm = "stories15m";
     Game public last_game;
     IInputBox inputBox = IInputBox(0x59b22D57D4f067708AB0c00552767405926dc768);
 
@@ -41,7 +43,6 @@ contract TrustAndTeach {
 
     function set_dapp_address(address l2_dapp) public {
         require(msg.sender == deployer);
-
         L2_DAPP = l2_dapp;
     }
 
@@ -94,6 +95,19 @@ contract TrustAndTeach {
     {
         bytes memory payload = abi.encode(conversation_id, prompt);
         inputBox.addInput(L2_DAPP, payload); // this line gives an error :-(
+    }
+
+    function announcePromptResponse(
+        uint256 conversation_id,
+        string[] memory responses
+    ) public {
+        // require(msg.sender == L2_DAPP);
+        require(conversation_id <= current_conversation_id);
+        // adds each response to a conversation as a list of responses
+        Conversation storage conversation = conversations[conversation_id];
+        conversation.responses = responses; // this is a list of responses to the prompt
+        conversation.responseAnnouncedTimestamp = block.timestamp;
+        emit PromptResponseAnnounced(conversation_id, responses);
     }
 
     // function l2_coin_toss(bytes memory gamekey, string memory prompt) private {
