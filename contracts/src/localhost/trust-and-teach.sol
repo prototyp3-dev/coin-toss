@@ -61,9 +61,7 @@ contract TrustAndTeach {
     }
 
     // used to create or play game between two players
-    function sendInstructionPrompt(address opponent, string memory prompt)
-        public
-    {
+    function sendInstructionPrompt(string memory prompt) public {
         // require(L2_DAPP != address(0));
         Conversation storage conversation = conversations[
             current_conversation_id
@@ -71,35 +69,42 @@ contract TrustAndTeach {
         conversation.author = msg.sender;
         conversation.prompt = prompt;
         conversation.createInstructionTimestamp = block.timestamp;
-        // cartesiSubmitPrompt(current_conversation_id, prompt);
+        cartesiSubmitPrompt(current_conversation_id, prompt);
         emit PromptSent(current_conversation_id, prompt);
         current_conversation_id++;
 
-        bytes memory gamekey = get_gamekey(msg.sender, opponent);
-        Game storage game = games[gamekey].matches[
-            games[gamekey].current_match_id
-        ];
+        // bytes memory gamekey = get_gamekey(msg.sender, opponent);
+        // Game storage game = games[gamekey].matches[
+        //     games[gamekey].current_match_id
+        // ];
 
-        require(!game.exists || game.pending_player == msg.sender);
+        // require(!game.exists || game.pending_player == msg.sender);
 
-        if (!game.exists) {
-            game.pending_player = opponent;
-            game.exists = true;
-        } else if (game.pending_player == msg.sender) {
-            l2_coin_toss(gamekey, prompt);
-            game.pending_player = address(0);
-        }
+        // if (!game.exists) {
+        //     game.pending_player = opponent;
+        //     game.exists = true;
+        // } else if (game.pending_player == msg.sender) {
+        //     l2_coin_toss(gamekey, prompt);
+        //     game.pending_player = address(0);
+        // }
     }
 
-    function l2_coin_toss(bytes memory gamekey, string memory prompt) private {
-        // generate randomness
-        uint256 coin_toss_seed = uint256(blockhash(block.number - 1));
-
-        bytes memory payload = abi.encode(gamekey, coin_toss_seed, prompt);
-
-        // calls Cartesi's addInput to run the "coin toss" inside Cartesi Machine
-        inputBox.addInput(L2_DAPP, payload);
+    function cartesiSubmitPrompt(uint256 conversation_id, string memory prompt)
+        public
+    {
+        bytes memory payload = abi.encode(conversation_id, prompt);
+        inputBox.addInput(L2_DAPP, payload); // this line gives an error :-(
     }
+
+    // function l2_coin_toss(bytes memory gamekey, string memory prompt) private {
+    //     // generate randomness
+    //     uint256 coin_toss_seed = uint256(blockhash(block.number - 1));
+
+    //     bytes memory payload = abi.encode(gamekey, coin_toss_seed, prompt);
+
+    //     // calls Cartesi's addInput to run the "coin toss" inside Cartesi Machine
+    //     inputBox.addInput(L2_DAPP, payload);
+    // }
 
     function announce_winner(
         address player1,
