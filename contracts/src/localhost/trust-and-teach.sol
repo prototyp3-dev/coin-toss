@@ -48,7 +48,9 @@ contract TrustAndTeach {
     }
 
     // used to create or play game between two players
-    function play(address opponent, string memory prompt) public {
+    function sendInstructionPrompt(address opponent, string memory prompt)
+        public
+    {
         require(L2_DAPP != address(0));
 
         bytes memory gamekey = get_gamekey(msg.sender, opponent);
