@@ -83,7 +83,7 @@ def handle_advance(data):
         # conversation_id, prompt = decode_abi(['uint256','string'], binary)
         # player1, player2 = decode_abi(["address", "address"], gamekey)
 
-        promptLLMResponse = submitPrompt(inputInput)
+        promptLLMResponse = submitPrompt(promptInput)
         # result = toss_coin(seed)
 
         # winner = None
