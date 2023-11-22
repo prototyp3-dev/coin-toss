@@ -60,28 +60,29 @@ def handle_advance(data):
         binary = bytes.fromhex(data["payload"][2:])
 
         # decode payload
-        gamekey, seed, prompt = decode_abi(['bytes', 'uint256','string'], binary)
-        player1, player2 = decode_abi(["address", "address"], gamekey)
+        conversation_id, prompt = decode_abi(['uint256','string'], binary)
+        # player1, player2 = decode_abi(["address", "address"], gamekey)
 
-        result = toss_coin(seed)
+        # result = toss_coin(seed)
 
-        winner = None
-        if result == 0:
-            winner = player1
-        else:
-            winner = player2
+        # winner = None
+        # if result == 0:
+        #     winner = player1
+        # else:
+        #     winner = player2
 
         notice = {
             "timestamp": data["metadata"]["timestamp"],
-            "winner": winner,
+            # "winner": winner,
+            "conversation_id": conversation_id,
             "prompt": prompt
         }
 
         post("notice", {"payload": str2hex(json.dumps(notice))})
 
-        voucher_payload = ANNOUNCE_WINNER_FUNCTION + encode_abi(["address", "address", "address"], [player1, player2, winner])
-        voucher = {"destination": coin_toss_addr, "payload": "0x" + voucher_payload.hex()}
-        post("voucher", voucher)
+        # voucher_payload = ANNOUNCE_WINNER_FUNCTION + encode_abi(["address", "address", "address"], [player1, player2, winner])
+        # voucher = {"destination": coin_toss_addr, "payload": "0x" + voucher_payload.hex()}
+        # post("voucher", voucher)
 
     except Exception as e:
         status = "reject"
