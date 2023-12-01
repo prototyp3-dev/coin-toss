@@ -9,8 +9,10 @@ RUN apt-get update \
   && rm -rf /var/apt/lists/*
 
 
-RUN curl -o tokenizer.bin https://huggingface.co/karpathy/tinyllamas/raw/main/tokenizer.bin
-RUN curl -o stories15M.bin https://huggingface.co/karpathy/tinyllamas/raw/main/stories15M.bin
+COPY ./tokenizer.bin .
+# RUN curl -o tokenizer.bin https://huggingface.co/karpathy/tinyllamas/raw/main/tokenizer.bin
+COPY ./stories15M.bin .
+# RUN curl -o stories15M.bin https://huggingface.co/karpathy/tinyllamas/raw/main/stories15M.bin
 COPY ./run.c .
 
 RUN gcc -Ofast run.c  -lm  -o run
