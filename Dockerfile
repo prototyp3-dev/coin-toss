@@ -13,7 +13,7 @@ RUN apt-get update \
 # COPY ./stories15M.bin .
 # COPY ./run.c .
 
-RUN gcc -Ofast run.c  -lm  -o run
+# RUN gcc -Ofast run.c  -lm  -o run
 
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt --no-cache \
