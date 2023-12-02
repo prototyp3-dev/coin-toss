@@ -9,9 +9,9 @@ RUN apt-get update \
   && rm -rf /var/apt/lists/*
 
 
-COPY ./tokenizer.bin .
-COPY ./stories15M.bin .
-COPY ./run.c .
+# COPY ./tokenizer.bin .
+# COPY ./stories15M.bin .
+# COPY ./run.c .
 
 RUN gcc -Ofast run.c  -lm  -o run
 
