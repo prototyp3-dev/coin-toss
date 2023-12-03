@@ -1,4 +1,4 @@
-# Copyright 2022 Cartesi Pte. Ltd.
+# Copyright Kirill Igumenshchev
 #
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -27,8 +27,6 @@ logger.info(f"HTTP rollup_server url is {rollup_server}")
 
 k = keccak.new(digest_bits=256)
 announcePromptResponse = k.update(b'announcePromptResponse(uint256,string[])').digest()[:4] # first 4 bytes
-# k.update(b'announce_winner(address,address,address)')
-# ANNOUNCE_WINNER_FUNCTION = k.digest()[:4] # first 4 bytes
 
 # logger.info(f"HTTP rollup_server url is {rollup_server}")
 PROMPT_CMD_head = "./run stories15M.bin -t 0.8 -n 100 -i '"
@@ -85,13 +83,6 @@ def handle_advance(data):
         # player1, player2 = decode_abi(["address", "address"], gamekey)
 
         promptLLMResponse = submitPrompt(promptInput)
-        # result = toss_coin(seed)
-
-        # winner = None
-        # if result == 0:
-        #     winner = player1
-        # else:
-        #     winner = player2
 
         notice = {
             "conversationId": conversationId,
@@ -99,17 +90,9 @@ def handle_advance(data):
             "promptInput": promptInput,
             "promptLLMResponse": promptLLMResponse
         }
-        # notice = {
-        #     "timestamp": data["metadata"]["timestamp"],
-        #     # "winner": winner,
-        #     "conversation_id": conversation_id,
-        #     "prompt": prompt
-        # }
 
         post("notice", {"payload": str2hex(json.dumps(notice))})
 
-        # voucher_payload = ANNOUNCE_WINNER_FUNCTION + encode_abi(["address", "address", "address"], [player1, player2, winner])
-        # voucher = {"destination": coin_toss_addr, "payload": "0x" + voucher_payload.hex()}
         voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponse])
         voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
         post("voucher", voucher)

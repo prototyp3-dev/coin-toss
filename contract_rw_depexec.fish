@@ -60,8 +60,8 @@ function test_cartesi_voucher
       echo "Block number is $decimal_number, which is greater than $cut_off_block."
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"set_dapp_address(address)\" $DAPP_ADDRESS"
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"sendInstructionPrompt(string)\" \"heeeeieeeyy\""
-      echo "+++++ conversations: "
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"current_conversation_id()\""
+      echo "+++++ conversations count: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"current_conversation_id()\"" &| tee -a $logfile
       curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[864010]}' http://localhost:8545
       curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[864010]}' http://localhost:8545
       break
@@ -108,9 +108,14 @@ function test_cartesi_voucher
       yarn start voucher execute --index 0 --input 0 &| tee -a $logfile
       cd -
 
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"last_game()\""
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversation(uint256)\" 0"
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversation(uint256)\" 1"
+      echo "+++++ conversation: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversation(uint256)\" 0" &| tee -a $logfile
+      echo "+++++ conversation 0 responses count: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseCount(uint256)\" 0" &| tee -a $logfile
+      echo "+++++ conversation 0 response 0: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponse(uint256,uint256)\" 0 0" &| tee -a $logfile
+      echo "+++++ conversation 0 response 1: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponse(uint256,uint256)\" 0 1" &| tee -a $logfile
       docker compose -f docker-compose.yml -f docker-compose.override.yml down -v
       # docker images && docker ps -a --no-trunc &&  docker volume ls && docker network ls
       break

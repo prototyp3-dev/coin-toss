@@ -91,6 +91,26 @@ contract TrustAndTeach {
         );
     }
 
+    // get conversation id response count
+    function getConversationResponseCount(uint256 conversation_id)
+        public
+        view
+        returns (uint256)
+    {
+        Conversation storage conversation = conversations[conversation_id];
+        return conversation.responses.length;
+    }
+
+    //get conversation #id response by index
+    function getConversationResponse(uint256 conversation_id, uint256 index)
+        public
+        view
+        returns (string memory)
+    {
+        Conversation storage conversation = conversations[conversation_id];
+        return conversation.responses[index];
+    }
+
     event PromptSent(uint256 conversation_id, string prompt);
     event PromptResponseAnnounced(uint256 conversation_id, string[] responses);
     event PromptResponsesRanked(uint256 conversation_id, uint256[] ranks);
