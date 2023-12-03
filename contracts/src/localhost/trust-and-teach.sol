@@ -65,6 +65,32 @@ contract TrustAndTeach {
         emit PromptResponseAnnounced(conversation_id, responses);
     }
 
+    // get the conversation by id
+    function getConversation(uint256 conversation_id)
+        public
+        view
+        returns (
+            address,
+            string memory,
+            string[] memory,
+            uint256[] memory,
+            uint256,
+            uint256,
+            uint256
+        )
+    {
+        Conversation storage conversation = conversations[conversation_id];
+        return (
+            conversation.author,
+            conversation.prompt,
+            conversation.responses,
+            conversation.ranks,
+            conversation.createInstructionTimestamp,
+            conversation.responseAnnouncedTimestamp,
+            conversation.rankingTimestamp
+        );
+    }
+
     event PromptSent(uint256 conversation_id, string prompt);
     event PromptResponseAnnounced(uint256 conversation_id, string[] responses);
     event PromptResponsesRanked(uint256 conversation_id, uint256[] ranks);

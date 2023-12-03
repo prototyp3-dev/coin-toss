@@ -59,10 +59,6 @@ function test_cartesi_voucher
     if test $decimal_number -gt $cut_off_block_load
       echo "Block number is $decimal_number, which is greater than $cut_off_block."
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"set_dapp_address(address)\" $DAPP_ADDRESS"
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"play(address)\" $PLAYER2"
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER2_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"play(address)\" $PLAYER1"
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"play(address,string)\" $PLAYER2 \"hi\""
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $player2_private_key --rpc-url $rpc_url $coin_toss_address \"play(address,string)\" $player1 \"byr\""
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"sendInstructionPrompt(string)\" \"heeeeieeeyy\""
       echo "+++++ conversations: "
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"current_conversation_id()\""
@@ -113,8 +109,10 @@ function test_cartesi_voucher
       cd -
 
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"last_game()\""
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversation(uint256)\" 0"
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversation(uint256)\" 1"
       docker compose -f docker-compose.yml -f docker-compose.override.yml down -v
-      docker images && docker ps -a --no-trunc &&  docker volume ls && docker network ls
+      # docker images && docker ps -a --no-trunc &&  docker volume ls && docker network ls
       break
     end
 
