@@ -54,8 +54,8 @@ def toss_coin(seed):
     return random.randint(0,1)
 
 def submitPrompt(input):
-    # PROMPT_CMD = PROMPT_CMD_head + input + PROMPT_CMD_tail
-    PROMPT_CMD = "echo 'prompt response'"
+    PROMPT_CMD = PROMPT_CMD_head + input + PROMPT_CMD_tail
+    # PROMPT_CMD = "echo 'prompt response'"
     promptResponse1 = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
     promptResponse2 = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
     return [promptResponse1,promptResponse2];
