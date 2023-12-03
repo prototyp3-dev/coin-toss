@@ -9,12 +9,18 @@ RUN apt-get update \
   && rm -rf /var/apt/lists/*
 
 
+ARG FILE_NAME=stories15M.bin
+ARG FILE_URL=https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
+
+
 # COPY ./tokenizer.bin .
-RUN wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
-# COPY ./stories15M.bin .
+# RUN wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
+# COPY ./stories15M.bin . || wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
+# Try to copy the file. If it doesn't exist, download it using wget.
+RUN if ! cp $FILE_NAME /$FILE_NAME 2>/dev/null; then wget -O /$FILE_NAME $FILE_URL; fi
 COPY ./run.c .
 
-# RUN gcc -Ofast run.c  -lm  -o run
+RUN gcc -Ofast run.c  -lm  -o run
 
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt --no-cache \
