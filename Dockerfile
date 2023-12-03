@@ -10,7 +10,7 @@ RUN apt-get update \
 
 
 # COPY ./tokenizer.bin .
-wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
+RUN wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
 # COPY ./stories15M.bin .
 COPY ./run.c .
 
