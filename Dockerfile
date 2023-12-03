@@ -15,11 +15,6 @@ FROM python:3.8
 # Install necessary libraries
 RUN pip install transformers huggingface_hub
 
-# Download the model
-RUN python -c "from transformers import AutoModel; AutoModel.from_pretrained('bert-base-uncased')"
-RUN python -c "from huggingface_hub import hf_hub_download; hf_hub_download(repo_id='huggingface', filename='bert-base-uncased')"
-
-
 # $ ./run stories260K/stories260K.bin -z stories260K/tok512.bin -t 0.0
 
 # COPY ./tokenizer.bin .
