@@ -79,8 +79,6 @@ def handle_advance(data):
         # decode payload
         conversationId, promptInput = decode_abi(['uint256', 'string'], binary)
         logger.info(f"Received promptInput: {promptInput}, from conversationId: {conversationId}")
-        # conversation_id, prompt = decode_abi(['uint256','string'], binary)
-        # player1, player2 = decode_abi(["address", "address"], gamekey)
 
         promptLLMResponse = submitPrompt(promptInput)
 
