@@ -5,14 +5,14 @@ WORKDIR /opt/cartesi/dapp
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-  build-essential xxd \
+  build-essential wget xxd \
   && rm -rf /var/apt/lists/*
 
 
 # COPY ./tokenizer.bin .
-# wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
+wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
 # COPY ./stories15M.bin .
-# COPY ./run.c .
+COPY ./run.c .
 
 # RUN gcc -Ofast run.c  -lm  -o run
 
