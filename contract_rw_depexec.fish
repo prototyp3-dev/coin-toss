@@ -110,8 +110,8 @@ function test_cartesi_voucher
       cd -
 
       echo "+++++ conversation: " &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversation(uint256)\" 0" &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversation(uint256)\" 0"  | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationById(uint256)\" 0" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationById(uint256)\" 0"  | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
       echo "+++++ conversation 0 responses count: " &| tee -a $logfile
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseCount(uint256)\" 0" &| tee -a $logfile
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseCount(uint256)\" 0"  | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
