@@ -103,6 +103,16 @@ contract TrustAndTeach {
         return conversation.responses.length;
     }
 
+    // get prompt by conversation id
+    function getPromptByConversationId(uint256 conversation_id)
+        public
+        view
+        returns (string memory)
+    {
+        Conversation storage conversation = conversations[conversation_id];
+        return conversation.prompt;
+    }
+
     //get conversation #id response by index
     function getConversationResponse(uint256 conversation_id, uint256 index)
         public
