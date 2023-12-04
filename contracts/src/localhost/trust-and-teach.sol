@@ -111,6 +111,18 @@ contract TrustAndTeach {
         return conversation.responses[index];
     }
 
+    // assign rank to each response in a conversation and store the ranks on-chain
+    function rankResponses(uint256 conversation_id, uint256[] memory ranks)
+        public
+    {
+        // require(msg.sender == L2_DAPP);
+        require(conversation_id <= current_conversation_id);
+        Conversation storage conversation = conversations[conversation_id];
+        conversation.ranks = ranks;
+        conversation.rankingTimestamp = block.timestamp;
+        emit PromptResponsesRanked(conversation_id, ranks);
+    }
+
     event PromptSent(uint256 conversation_id, string prompt);
     event PromptResponseAnnounced(uint256 conversation_id, string[] responses);
     event PromptResponsesRanked(uint256 conversation_id, uint256[] ranks);
