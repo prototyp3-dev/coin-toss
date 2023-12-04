@@ -141,13 +141,20 @@ contract TrustAndTeach {
             "Invalid conversation ID"
         );
         Conversation storage conversation = conversations[conversation_id];
-        RankSubmission storage submission = conversation.rankSubmissions[
-            msg.sender
-        ];
-        submission.user = msg.sender;
-        submission.ranks = ranks;
-        conversation.rankingTimestamp = block.timestamp;
-        emit RankSubmitted(conversation_id, msg.sender, ranks);
+        RankSubmission storage submission = conversation.rankSubmissions[msg.sender];
+        // Check if the user has not already submitted ranks
+        if (submission.user == address(0)) {
+            submission.user = msg.sender;
+            submission.ranks = ranks;
+            conversation.rankSubmissionCount++; // Increment the count as this is a new submission
+            conversation.rankingTimestamp = block.timestamp;
+            emit RankSubmitted(conversation_id, msg.sender, ranks);
+        } else {
+            // User has already submitted ranks, update the ranks
+            submission.ranks = ranks;
+            conversation.rankingTimestamp = block.timestamp;
+            emit RankSubmitted(conversation_id, msg.sender, ranks);
+        }
     }
 
     event RankSubmitted(uint256 conversation_id, address user, uint256[] ranks);
