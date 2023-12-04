@@ -83,6 +83,18 @@ contract TrustAndTeach {
         return conversation.usersWhoSubmittedRanks; // Return the array of users who submitted ranks
     }
 
+    // get a specific rank submitted by a user for a conversation at a given index
+    function getRankByUserAtIndex(uint256 conversation_id, address user, uint256 index)
+        public
+        view
+        returns (uint256)
+    {
+        Conversation storage conversation = conversations[conversation_id];
+        RankSubmission storage submission = conversation.rankSubmissions[user];
+        require(index < submission.ranks.length, "Index out of bounds");
+        return submission.ranks[index];
+    }
+
     // get ranks submitted by a user for a conversation
     function getRanksByUser(uint256 conversation_id, address user)
         public
