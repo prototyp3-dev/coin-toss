@@ -10,11 +10,16 @@ contract TrustAndTeach {
     string public llm = "stories15m";
     IInputBox inputBox = IInputBox(0x59b22D57D4f067708AB0c00552767405926dc768);
 
+    struct RankSubmission {
+        address user;
+        uint256[] ranks;
+    }
+
     struct Conversation {
         address author;
         string prompt;
         string[] responses;
-        uint256[] ranks; // most relevent is 0
+        mapping(address => RankSubmission) rankSubmissions;
         uint256 createInstructionTimestamp;
         uint256 responseAnnouncedTimestamp;
         uint256 rankingTimestamp;
@@ -65,8 +70,8 @@ contract TrustAndTeach {
         emit PromptResponseAnnounced(conversation_id, responses);
     }
 
-    // get the conversation by id
-    function getConversation(uint256 conversation_id)
+    // get all rank submissions for a conversation
+    function getRankSubmissions(uint256 conversation_id)
         public
         view
         returns (
@@ -111,17 +116,18 @@ contract TrustAndTeach {
         return conversation.responses[index];
     }
 
-    // assign rank to each response in a conversation and store the ranks on-chain
-    function rankResponses(uint256 conversation_id, uint256[] memory ranks)
-        public
-    {
-        // require(msg.sender == L2_DAPP);
-        require(conversation_id <= current_conversation_id);
+    // submit rank to a conversation by a user
+    function submitRank(uint256 conversation_id, uint256[] memory ranks) public {
+        require(conversation_id <= current_conversation_id, "Invalid conversation ID");
         Conversation storage conversation = conversations[conversation_id];
-        conversation.ranks = ranks;
+        RankSubmission storage submission = conversation.rankSubmissions[msg.sender];
+        submission.user = msg.sender;
+        submission.ranks = ranks;
         conversation.rankingTimestamp = block.timestamp;
-        emit PromptResponsesRanked(conversation_id, ranks);
+        emit RankSubmitted(conversation_id, msg.sender, ranks);
     }
+
+    event RankSubmitted(uint256 conversation_id, address user, uint256[] ranks);
 
     event PromptSent(uint256 conversation_id, string prompt);
     event PromptResponseAnnounced(uint256 conversation_id, string[] responses);
