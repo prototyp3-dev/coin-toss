@@ -13,6 +13,7 @@ contract TrustAndTeach {
     struct RankSubmission {
         address user;
         uint256[] ranks;
+        uint256 rankingTimestamp; // Added rankingTimestamp to RankSubmission
     }
 
     struct Conversation {
@@ -23,7 +24,7 @@ contract TrustAndTeach {
         mapping(address => RankSubmission) rankSubmissions;
         uint256 createInstructionTimestamp;
         uint256 responseAnnouncedTimestamp;
-        uint256 rankingTimestamp;
+        // Removed rankingTimestamp from Conversation
     }
 
     uint256 public current_conversation_id = 0; // initial value is 0
@@ -147,7 +148,7 @@ contract TrustAndTeach {
             submission.user = msg.sender;
             submission.ranks = ranks;
             conversation.rankSubmissionCount++; // Increment the count as this is a new submission
-            conversation.rankingTimestamp = block.timestamp;
+            submission.rankingTimestamp = block.timestamp; // Set rankingTimestamp for the submission
             emit RankSubmitted(conversation_id, msg.sender, ranks);
         } else {
             // User has already submitted ranks, update the ranks
