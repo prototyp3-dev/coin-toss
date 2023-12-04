@@ -113,6 +113,32 @@ contract TrustAndTeach {
         return conversation.prompt;
     }
 
+    // get conversation by id
+    function getConversationById(uint256 conversation_id)
+        public
+        view
+        returns (
+            address author,
+            string memory prompt,
+            string[] memory responses,
+            uint256 rankSubmissionCount,
+            address[] memory usersWhoSubmittedRanks,
+            uint256 createInstructionTimestamp,
+            uint256 responseAnnouncedTimestamp
+        )
+    {
+        Conversation storage conversation = conversations[conversation_id];
+        return (
+            conversation.author,
+            conversation.prompt,
+            conversation.responses,
+            conversation.rankSubmissionCount,
+            conversation.usersWhoSubmittedRanks,
+            conversation.createInstructionTimestamp,
+            conversation.responseAnnouncedTimestamp
+        );
+    }
+
     //get conversation #id response by index
     function getConversationResponse(uint256 conversation_id, uint256 index)
         public
