@@ -138,6 +138,12 @@ function test_cartesi_voucher
       echo "+++++ retrieving ranks submitted by $PLAYER1 for conversation 0: " &| tee -a $logfile
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRanksByUser(uint256,address)\" 0 $PLAYER1" &| tee -a $logfile
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRanksByUser(uint256,address)\" 0 $PLAYER1" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      echo "+++++ retrieving rank 1 submitted by $PLAYER1 for conversation 0: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRankByUserAtIndex(uint256,address,uint256)\" 0 $PLAYER1 0" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRankByUserAtIndex(uint256,address,uint256)\" 0 $PLAYER1 0" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      echo "+++++ retrieving rank 2 submitted by $PLAYER1 for conversation 0: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRankByUserAtIndex(uint256,address,uint256)\" 0 $PLAYER1 1" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRankByUserAtIndex(uint256,address,uint256)\" 0 $PLAYER1 1" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
       docker compose -f docker-compose.yml -f docker-compose.override.yml down -v
       # docker images && docker ps -a --no-trunc &&  docker volume ls && docker network ls
       break
