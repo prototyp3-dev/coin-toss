@@ -24,7 +24,6 @@ contract TrustAndTeach {
         mapping(address => RankSubmission) rankSubmissions;
         uint256 createInstructionTimestamp;
         uint256 responseAnnouncedTimestamp;
-        // Removed rankingTimestamp from Conversation
     }
 
     uint256 public current_conversation_id = 0; // initial value is 0
@@ -79,26 +78,6 @@ contract TrustAndTeach {
         returns (address[] memory)
     {
         Conversation storage conversation = conversations[conversation_id];
-        uint256 submissionCount = 0;
-        // Count the number of rank submissions
-        for (uint256 i = 0; i < conversation.responses.length; i++) {
-            if (
-                conversation.rankSubmissions[conversation.responses[i]].user !=
-                address(0)
-            ) {
-                submissionCount++;
-            }
-        }
-        address[] memory users = new address[](submissionCount);
-        uint256 index = 0;
-        // Populate the users array with addresses who submitted ranks
-        for (uint256 i = 0; i < conversation.responses.length; i++) {
-            address user = conversation.responses[i];
-            if (conversation.rankSubmissions[user].user != address(0)) {
-                users[index] = user;
-                index++;
-            }
-        }
         return users;
     }
 
@@ -153,7 +132,7 @@ contract TrustAndTeach {
         } else {
             // User has already submitted ranks, update the ranks
             submission.ranks = ranks;
-            conversation.rankingTimestamp = block.timestamp;
+            submission.rankingTimestamp = block.timestamp;
             emit RankSubmitted(conversation_id, msg.sender, ranks);
         }
     }
