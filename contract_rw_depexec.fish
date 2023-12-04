@@ -126,10 +126,15 @@ function test_cartesi_voucher
       echo "+++++ submitting ranks for conversation 0: " &| tee -a $logfile
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"submitRank(uint256,uint256[])\" 0 [1,0]" &| tee -a $logfile
 
-      # Retrieving and outputting ranks for conversation 0
-      echo "+++++ retrieving ranks for conversation 0: " &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRankSubmissions(uint256)\" 0" &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRankSubmissions(uint256)\" 0" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      # Retrieving and outputting users who submitted ranks for conversation 0
+      echo "+++++ retrieving users who submitted ranks for conversation 0: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getUsersWhoSubmittedRanks(uint256)\" 0" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getUsersWhoSubmittedRanks(uint256)\" 0" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+
+      # Assuming we want to retrieve ranks for a specific user, replace USER_ADDRESS with the actual user's address
+      echo "+++++ retrieving ranks submitted by USER_ADDRESS for conversation 0: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRanksByUser(uint256,address)\" 0 USER_ADDRESS" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRanksByUser(uint256,address)\" 0 USER_ADDRESS" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
       docker compose -f docker-compose.yml -f docker-compose.override.yml down -v
       # docker images && docker ps -a --no-trunc &&  docker volume ls && docker network ls
       break
