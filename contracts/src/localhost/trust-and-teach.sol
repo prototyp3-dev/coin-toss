@@ -75,25 +75,20 @@ contract TrustAndTeach {
         public
         view
         returns (
-            address,
-            string memory,
-            string[] memory,
-            uint256[] memory,
-            uint256,
-            uint256,
-            uint256
+            address[] memory,
+            uint256[][] memory
         )
     {
         Conversation storage conversation = conversations[conversation_id];
-        return (
-            conversation.author,
-            conversation.prompt,
-            conversation.responses,
-            conversation.ranks,
-            conversation.createInstructionTimestamp,
-            conversation.responseAnnouncedTimestamp,
-            conversation.rankingTimestamp
-        );
+        address[] memory users = new address[](conversation.responses.length);
+        uint256[][] memory ranks = new uint256[][](conversation.responses.length);
+        uint256 i = 0;
+        for (uint256 i = 0; i < conversation.responses.length; i++) {
+            RankSubmission storage submission = conversation.rankSubmissions[conversation.responses[i]];
+            users[i] = submission.user;
+            ranks[i] = submission.ranks;
+        }
+        return (users, ranks);
     }
 
     // get conversation id response count
