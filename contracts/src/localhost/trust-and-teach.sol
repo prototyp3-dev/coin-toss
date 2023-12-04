@@ -8,6 +8,7 @@ contract TrustAndTeach {
     address public L2_DAPP;
     string public license = "MIT";
     string public llm = "stories15m";
+    uint256 public num_responses = 2;
     IInputBox inputBox = IInputBox(0x59b22D57D4f067708AB0c00552767405926dc768);
 
     struct RankSubmission {
@@ -30,15 +31,8 @@ contract TrustAndTeach {
     uint256 public current_conversation_id = 0; // initial value is 0
     mapping(uint256 => Conversation) conversations;
 
-    uint256 public num_responses;
-
     constructor() {
         deployer = msg.sender;
-    }
-
-    function set_num_responses(uint256 _num_responses) public {
-        require(msg.sender == deployer, "Only deployer can set the number of responses");
-        num_responses = _num_responses;
     }
 
     function set_dapp_address(address l2_dapp) public {
@@ -165,7 +159,9 @@ contract TrustAndTeach {
             "Invalid conversation ID"
         );
         Conversation storage conversation = conversations[conversation_id];
-        RankSubmission storage submission = conversation.rankSubmissions[msg.sender];
+        RankSubmission storage submission = conversation.rankSubmissions[
+            msg.sender
+        ];
         // Check if the user has not already submitted ranks
         if (submission.user == address(0)) {
             submission.user = msg.sender;
