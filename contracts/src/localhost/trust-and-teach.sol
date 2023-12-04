@@ -19,6 +19,7 @@ contract TrustAndTeach {
         address author;
         string prompt;
         string[] responses;
+        uint256 rankSubmissionCount;
         mapping(address => RankSubmission) rankSubmissions;
         uint256 createInstructionTimestamp;
         uint256 responseAnnouncedTimestamp;
@@ -80,7 +81,10 @@ contract TrustAndTeach {
         uint256 submissionCount = 0;
         // Count the number of rank submissions
         for (uint256 i = 0; i < conversation.responses.length; i++) {
-            if (conversation.rankSubmissions[conversation.responses[i]].user != address(0)) {
+            if (
+                conversation.rankSubmissions[conversation.responses[i]].user !=
+                address(0)
+            ) {
                 submissionCount++;
             }
         }
@@ -129,10 +133,17 @@ contract TrustAndTeach {
     }
 
     // submit rank to a conversation by a user
-    function submitRank(uint256 conversation_id, uint256[] memory ranks) public {
-        require(conversation_id <= current_conversation_id, "Invalid conversation ID");
+    function submitRank(uint256 conversation_id, uint256[] memory ranks)
+        public
+    {
+        require(
+            conversation_id <= current_conversation_id,
+            "Invalid conversation ID"
+        );
         Conversation storage conversation = conversations[conversation_id];
-        RankSubmission storage submission = conversation.rankSubmissions[msg.sender];
+        RankSubmission storage submission = conversation.rankSubmissions[
+            msg.sender
+        ];
         submission.user = msg.sender;
         submission.ranks = ranks;
         conversation.rankingTimestamp = block.timestamp;
