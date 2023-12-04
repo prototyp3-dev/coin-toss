@@ -30,8 +30,15 @@ contract TrustAndTeach {
     uint256 public current_conversation_id = 0; // initial value is 0
     mapping(uint256 => Conversation) conversations;
 
+    uint256 public num_responses;
+
     constructor() {
         deployer = msg.sender;
+    }
+
+    function set_num_responses(uint256 _num_responses) public {
+        require(msg.sender == deployer, "Only deployer can set the number of responses");
+        num_responses = _num_responses;
     }
 
     function set_dapp_address(address l2_dapp) public {
