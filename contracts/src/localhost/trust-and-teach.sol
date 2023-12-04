@@ -70,25 +70,30 @@ contract TrustAndTeach {
         emit PromptResponseAnnounced(conversation_id, responses);
     }
 
-    // get all rank submissions for a conversation
-    function getRankSubmissions(uint256 conversation_id)
+    // get list of users who submitted ranks for a conversation
+    function getUsersWhoSubmittedRanks(uint256 conversation_id)
         public
         view
-        returns (
-            address[] memory,
-            uint256[][] memory
-        )
+        returns (address[] memory)
     {
         Conversation storage conversation = conversations[conversation_id];
-        address[] memory users = new address[](conversation.responses.length);
-        uint256[][] memory ranks = new uint256[][](conversation.responses.length);
-        uint256 i = 0;
-        for (uint256 i = 0; i < conversation.responses.length; i++) {
-            RankSubmission storage submission = conversation.rankSubmissions[conversation.responses[i]];
-            users[i] = submission.user;
-            ranks[i] = submission.ranks;
+        uint256 responseCount = conversation.responses.length;
+        address[] memory users = new address[](responseCount);
+        for (uint256 i = 0; i < responseCount; i++) {
+            users[i] = conversation.responses[i];
         }
-        return (users, ranks);
+        return users;
+    }
+
+    // get ranks submitted by a user for a conversation
+    function getRanksByUser(uint256 conversation_id, address user)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        Conversation storage conversation = conversations[conversation_id];
+        RankSubmission storage submission = conversation.rankSubmissions[user];
+        return submission.ranks;
     }
 
     // get conversation id response count
