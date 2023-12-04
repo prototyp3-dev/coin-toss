@@ -80,7 +80,7 @@ contract TrustAndTeach {
         uint256 submissionCount = 0;
         // Count the number of rank submissions
         for (uint256 i = 0; i < conversation.responses.length; i++) {
-            if (conversation.rankSubmissions[conversation.responses[i]].ranks.length > 0) {
+            if (conversation.rankSubmissions[conversation.responses[i]].user != address(0)) {
                 submissionCount++;
             }
         }
@@ -89,7 +89,7 @@ contract TrustAndTeach {
         // Populate the users array with addresses who submitted ranks
         for (uint256 i = 0; i < conversation.responses.length; i++) {
             address user = conversation.responses[i];
-            if (conversation.rankSubmissions[user].ranks.length > 0) {
+            if (conversation.rankSubmissions[user].user != address(0)) {
                 users[index] = user;
                 index++;
             }
