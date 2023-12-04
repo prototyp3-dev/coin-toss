@@ -77,10 +77,22 @@ contract TrustAndTeach {
         returns (address[] memory)
     {
         Conversation storage conversation = conversations[conversation_id];
-        uint256 responseCount = conversation.responses.length;
-        address[] memory users = new address[](responseCount);
-        for (uint256 i = 0; i < responseCount; i++) {
-            users[i] = conversation.responses[i];
+        uint256 submissionCount = 0;
+        // Count the number of rank submissions
+        for (uint256 i = 0; i < conversation.responses.length; i++) {
+            if (conversation.rankSubmissions[conversation.responses[i]].ranks.length > 0) {
+                submissionCount++;
+            }
+        }
+        address[] memory users = new address[](submissionCount);
+        uint256 index = 0;
+        // Populate the users array with addresses who submitted ranks
+        for (uint256 i = 0; i < conversation.responses.length; i++) {
+            address user = conversation.responses[i];
+            if (conversation.rankSubmissions[user].ranks.length > 0) {
+                users[index] = user;
+                index++;
+            }
         }
         return users;
     }
