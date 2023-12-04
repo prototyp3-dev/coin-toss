@@ -22,6 +22,7 @@ contract TrustAndTeach {
         string[] responses;
         uint256 rankSubmissionCount;
         mapping(address => RankSubmission) rankSubmissions;
+        address[] usersWhoSubmittedRanks; // Array to keep track of users who submitted ranks
         uint256 createInstructionTimestamp;
         uint256 responseAnnouncedTimestamp;
     }
@@ -78,7 +79,7 @@ contract TrustAndTeach {
         returns (address[] memory)
     {
         Conversation storage conversation = conversations[conversation_id];
-        return users;
+        return conversation.usersWhoSubmittedRanks; // Return the array of users who submitted ranks
     }
 
     // get ranks submitted by a user for a conversation
@@ -128,11 +129,12 @@ contract TrustAndTeach {
             submission.ranks = ranks;
             conversation.rankSubmissionCount++; // Increment the count as this is a new submission
             submission.rankingTimestamp = block.timestamp; // Set rankingTimestamp for the submission
+            conversation.usersWhoSubmittedRanks.push(msg.sender); // Add user to the list of users who submitted ranks
             emit RankSubmitted(conversation_id, msg.sender, ranks);
         } else {
             // User has already submitted ranks, update the ranks
             submission.ranks = ranks;
-            submission.rankingTimestamp = block.timestamp;
+            submission.rankingTimestamp = block.timestamp; // Update rankingTimestamp for the submission
             emit RankSubmitted(conversation_id, msg.sender, ranks);
         }
     }
