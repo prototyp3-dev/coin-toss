@@ -16,6 +16,7 @@ import subprocess
 import requests
 import json
 import random
+import string
 from eth_abi import decode_abi, encode_abi
 from Crypto.Hash import keccak
 
@@ -54,8 +55,14 @@ def toss_coin(seed):
     return random.randint(0,1)
 
 def submitPrompt(input):
-    PROMPT_CMD = PROMPT_CMD_head + input + PROMPT_CMD_tail
+    # PROMPT_CMD = PROMPT_CMD_head + input + PROMPT_CMD_tail
     # PROMPT_CMD = "echo 'prompt response'"
+    prompt_length = 1000
+    # generate a string of prompt_length letters and spaces
+    random_sting = ''.join(random.choice(string.ascii_letters + ' ') for i in range(prompt_length))
+    PROMPT_CMD = "echo '"+random_sting+"'"
+    logger.info(f"Prompt command: {PROMPT_CMD}")
+
     promptResponse1 = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
     promptResponse2 = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
     return [promptResponse1,promptResponse2];
