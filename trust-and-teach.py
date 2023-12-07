@@ -57,10 +57,10 @@ def toss_coin(seed):
 def submitPrompt(input):
     # PROMPT_CMD = PROMPT_CMD_head + input + PROMPT_CMD_tail
     # PROMPT_CMD = "echo 'prompt response'"
-    prompt_length = 1000
-    # generate a string of prompt_length letters and spaces
+    prompt_length = 10
+    # prompt_length = 1000
     random_sting = ''.join(random.choice(string.ascii_letters + ' ') for i in range(prompt_length))
-    PROMPT_CMD = "echo 'Prompt response as a random string dsds"+random_sting+"'"
+    PROMPT_CMD = "echo 'prmptrsppp"+random_sting+"'"
     logger.info(f"Prompt command: {PROMPT_CMD}")
 
     promptResponse1 = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
