@@ -109,6 +109,9 @@ function test_cartesi_voucher
       yarn start voucher execute --index 0 --input 0 &| tee -a $logfile
       cd -
 
+      curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[864010]}' http://localhost:8545
+      curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[864010]}' http://localhost:8545
+
       echo "+++++ conversation by ID: " &| tee -a $logfile
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationById(uint256)\" 0" &| tee -a $logfile
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationById(uint256)\" 0"  | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
