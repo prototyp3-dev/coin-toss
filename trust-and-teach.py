@@ -57,7 +57,7 @@ def toss_coin(seed):
 def submitPrompt(input):
     # PROMPT_CMD = PROMPT_CMD_head + input + PROMPT_CMD_tail
     # PROMPT_CMD = "echo 'prompt response'"
-    prompt_length = 100
+    prompt_length = 500
     # prompt_length = 1000
     random_sting = ''.join(random.choice(string.ascii_letters + ' ') for i in range(prompt_length))
     PROMPT_CMD = "echo 'prmptrsppp"+random_sting+"'"
