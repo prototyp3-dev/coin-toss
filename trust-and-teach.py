@@ -95,7 +95,7 @@ def handle_advance(data):
         promptLLMResponse2 = submitPrompt(promptInput)
         promptLLMResponse = [promptLLMResponse1,promptLLMResponse2]
 
-        logger.info(f">>>>>>>> <> promptLLMResponses: {promptLLMResponse}")
+        logger.info(f">>>>>>>> <> promptLLMResponse: {promptLLMResponse}")
         # notice = {
         #     "conversationId": conversationId,
         #     "promptAuthor": promptAuthor_addr,
@@ -131,11 +131,11 @@ def handle_advance(data):
                             "conversationId": conversationId,
                             "promptAuthor": promptAuthor_addr,
                             "promptInput": promptInput,
-                            "promptLLMResponseNumber": 0,
-                            "promptLLMResponseSplit": 0,
+                            # "promptLLMResponseNumber": 0,
+                            # "promptLLMResponseSplit": 0,
+                            "promptLLMResponseNumber": i,
+                            "promptLLMResponseSplit": j,
                             "promptLLMResponse": promptLLMResponse
-                            # "promptLLMResponseNumber": i,
-                            # "promptLLMResponseSplit": j,
                             # "promptLLMResponse": promptLLMResponses[i][j]
                         }
                 logger.info(f">>>>>>>nnnnnspsp> <> notice: {notice}")
