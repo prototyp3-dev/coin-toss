@@ -27,7 +27,7 @@ rollup_server = environ["ROLLUP_HTTP_SERVER_URL"]
 logger.info(f"HTTP rollup_server url is {rollup_server}")
 
 k = keccak.new(digest_bits=256)
-announcePromptResponse = k.update(b'announcePromptResponse(uint256,string[])').digest()[:4] # first 4 bytes
+announcePromptResponse = k.update(b'announcePromptResponse(uint256,uint256,uint256,string)').digest()[:4] # first 4 bytes
 
 # logger.info(f"HTTP rollup_server url is {rollup_server}")
 PROMPT_CMD_head = "./run stories15M.bin -t 0.8 -n 20 -i '"
@@ -120,6 +120,7 @@ def handle_advance(data):
             # split the response into a list of strings of 512 characters
             promptLLMResponse_splits = [promptLLMResponse_whole[0][i:i+response_split_length] for i in range(0, len(promptLLMResponse_whole[0]), response_split_length)]
             promptLLMResponses += [ promptLLMResponse_splits ]
+        promptLLMResponses = "prmptrspppIUJysujqZCECgzAmhuEIUirpeTiEZQoWdqxOiDlH"
         logger.info(f">>>>>>>[]> <> promptLLMResponses: {promptLLMResponses}")
         logger.info(f">>>>>>>00> <> promptLLMResponses: {promptLLMResponses[0][0]}")
 
@@ -133,14 +134,15 @@ def handle_advance(data):
                             "promptInput": promptInput,
                             "promptLLMResponseNumber": i,
                             "promptLLMResponseSplit": j,
-                            "promptLLMResponse": promptLLMResponse[0]
+                            "promptLLMResponse": promptLLMResponse
+                            # "promptLLMResponse": promptLLMResponse[0]
                             # "promptLLMResponse": promptLLMResponses[i][j]
                         }
                 logger.info(f">>>>>>>nnnnnspsp> <> notice: {notice}")
                 post("notice", {"payload": str2hex(json.dumps(notice))})
                 notices += [ notice ]
 
-                voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponse[0]])
+                voucher_payload = announcePromptResponse + encode_abi(["uint256", "uint256", "uint256", "string"], [conversationId, i, j, promptLLMResponse[i][j]])
                 # voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponse])
                # voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponses[i][j]])
                 voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}

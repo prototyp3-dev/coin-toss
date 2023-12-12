@@ -20,7 +20,8 @@ contract TrustAndTeach {
     struct Conversation {
         address author;
         string prompt;
-        string[] responses;
+        // mapping(uint256 => mapping(uint256 => string)) responses;
+        string[][] responses;
         uint256 rankSubmissionCount;
         mapping(address => RankSubmission) rankSubmissions;
         address[] usersWhoSubmittedRanks; // Array to keep track of users who submitted ranks
@@ -60,50 +61,38 @@ contract TrustAndTeach {
         inputBox.addInput(L2_DAPP, payload); // this line gives an error :-(
     }
 
+    function getPromptByConversationId(uint256 conversation_id)
+        public
+        view
+        returns (string memory)
+    {
+        Conversation storage conversation = conversations[conversation_id];
+        return conversation.prompt;
+    }
+
     function announcePromptResponse(
         uint256 conversation_id,
-        string[] memory responses
+        uint256 iResponse,
+        uint256 iSplitResponse,
+        string memory response
     ) public {
         // require(msg.sender == L2_DAPP);
         require(conversation_id <= current_conversation_id);
-        // adds each response to a conversation as a list of responses
+        require(iResponse <= num_responses);
+        require(bytes(response).length != 0);
         Conversation storage conversation = conversations[conversation_id];
-        conversation.responses = responses; // this is a list of responses to the prompt
+        require(
+            iSplitResponse < conversation.responses[iResponse].length,
+            "iSplitResponse out of bounds"
+        );
+        conversation.responses[iResponse][iSplitResponse] = response;
         conversation.responseAnnouncedTimestamp = block.timestamp;
-        emit PromptResponseAnnounced(conversation_id, responses);
-    }
-
-    // get list of users who submitted ranks for a conversation
-    function getUsersWhoSubmittedRanks(uint256 conversation_id)
-        public
-        view
-        returns (address[] memory)
-    {
-        Conversation storage conversation = conversations[conversation_id];
-        return conversation.usersWhoSubmittedRanks; // Return the array of users who submitted ranks
-    }
-
-    // get a specific rank submitted by a user for a conversation at a given index
-    function getRankByUserAtIndex(uint256 conversation_id, address user, uint256 index)
-        public
-        view
-        returns (uint256)
-    {
-        Conversation storage conversation = conversations[conversation_id];
-        RankSubmission storage submission = conversation.rankSubmissions[user];
-        require(index < submission.ranks.length, "Index out of bounds");
-        return submission.ranks[index];
-    }
-
-    // get ranks submitted by a user for a conversation
-    function getRanksByUser(uint256 conversation_id, address user)
-        public
-        view
-        returns (uint256[] memory)
-    {
-        Conversation storage conversation = conversations[conversation_id];
-        RankSubmission storage submission = conversation.rankSubmissions[user];
-        return submission.ranks;
+        emit PromptResponseAnnounced(
+            conversation_id,
+            iResponse,
+            iSplitResponse,
+            response
+        );
     }
 
     // get conversation id response count
@@ -116,50 +105,23 @@ contract TrustAndTeach {
         return conversation.responses.length;
     }
 
-    // get prompt by conversation id
-    function getPromptByConversationId(uint256 conversation_id)
-        public
-        view
-        returns (string memory)
-    {
+    // get conversation #id response length
+    function getConversationResponseLength(
+        uint256 conversation_id,
+        uint256 index
+    ) public view returns (uint256) {
         Conversation storage conversation = conversations[conversation_id];
-        return conversation.prompt;
+        return conversation.responses[index].length;
     }
 
-    // get conversation by id
-    function getConversationById(uint256 conversation_id)
-        public
-        view
-        returns (
-            address author,
-            string memory prompt,
-            string[] memory responses,
-            uint256 rankSubmissionCount,
-            address[] memory usersWhoSubmittedRanks,
-            uint256 createInstructionTimestamp,
-            uint256 responseAnnouncedTimestamp
-        )
-    {
+    // get conversation #id response #iResponse #iSplitResponse
+    function getConversationResponseByIndex(
+        uint256 conversation_id,
+        uint256 iResponse,
+        uint256 iSplitResponse
+    ) public view returns (string memory) {
         Conversation storage conversation = conversations[conversation_id];
-        return (
-            conversation.author,
-            conversation.prompt,
-            conversation.responses,
-            conversation.rankSubmissionCount,
-            conversation.usersWhoSubmittedRanks,
-            conversation.createInstructionTimestamp,
-            conversation.responseAnnouncedTimestamp
-        );
-    }
-
-    //get conversation #id response by index
-    function getConversationResponse(uint256 conversation_id, uint256 index)
-        public
-        view
-        returns (string memory)
-    {
-        Conversation storage conversation = conversations[conversation_id];
-        return conversation.responses[index];
+        return conversation.responses[iResponse][iSplitResponse];
     }
 
     // submit rank to a conversation by a user
@@ -188,6 +150,65 @@ contract TrustAndTeach {
             submission.rankingTimestamp = block.timestamp; // Update rankingTimestamp for the submission
             emit RankSubmitted(conversation_id, msg.sender, ranks);
         }
+    }
+
+    // get list of users who submitted ranks for a conversation
+    function getUsersWhoSubmittedRanks(uint256 conversation_id)
+        public
+        view
+        returns (address[] memory)
+    {
+        Conversation storage conversation = conversations[conversation_id];
+        return conversation.usersWhoSubmittedRanks; // Return the array of users who submitted ranks
+    }
+
+    // get ranks submitted by a user for a conversation
+    function getRanksByUser(uint256 conversation_id, address user)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        Conversation storage conversation = conversations[conversation_id];
+        RankSubmission storage submission = conversation.rankSubmissions[user];
+        return submission.ranks;
+    }
+
+    // get a specific rank submitted by a user for a conversation at a given index
+    function getRankByUserAtIndex(
+        uint256 conversation_id,
+        address user,
+        uint256 index
+    ) public view returns (uint256) {
+        Conversation storage conversation = conversations[conversation_id];
+        RankSubmission storage submission = conversation.rankSubmissions[user];
+        require(index < submission.ranks.length, "Index out of bounds");
+        return submission.ranks[index];
+    }
+
+    // get conversation by id
+    function getConversationById(uint256 conversation_id)
+        public
+        view
+        returns (
+            address author,
+            string memory prompt,
+            string[][] memory responses,
+            uint256 rankSubmissionCount,
+            address[] memory usersWhoSubmittedRanks,
+            uint256 createInstructionTimestamp,
+            uint256 responseAnnouncedTimestamp
+        )
+    {
+        Conversation storage conversation = conversations[conversation_id];
+        return (
+            conversation.author,
+            conversation.prompt,
+            conversation.responses,
+            conversation.rankSubmissionCount,
+            conversation.usersWhoSubmittedRanks,
+            conversation.createInstructionTimestamp,
+            conversation.responseAnnouncedTimestamp
+        );
     }
 
     event RankSubmitted(uint256 conversation_id, address user, uint256[] ranks);
