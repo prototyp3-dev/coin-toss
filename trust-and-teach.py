@@ -66,9 +66,8 @@ def submitPrompt(input):
     PROMPT_CMD = "echo '"+prompt_length_prefix+random_sting+"'"
     logger.info(f"Prompt command: {PROMPT_CMD}")
 
-    promptResponse1 = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
-    promptResponse2 = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
-    return [promptResponse1,promptResponse2];
+    promptResponse = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
+    return promptResponse
 
 
 def handle_advance(data):
@@ -90,7 +89,9 @@ def handle_advance(data):
         conversationId, promptInput = decode_abi(['uint256', 'string'], binary)
         logger.info(f"Received promptInput: {promptInput}, from conversationId: {conversationId}")
 
-        promptLLMResponse = submitPrompt(promptInput)
+        promptLLMResponse1 = submitPrompt(promptInput)
+        promptLLMResponse2 = submitPrompt(promptInput)
+        promptLLMResponse = [promptLLMResponse1,promptLLMResponse2]
 
         notice = {
             "conversationId": conversationId,
