@@ -98,6 +98,7 @@ def handle_advance(data):
             # split the response into a list of strings of 512 characters
             promptLLMResponse_splits = [promptLLMResponse_whole[0][i:i+response_split_length] for i in range(0, len(promptLLMResponse_whole[0]), response_split_length)]
             promptLLMResponses += [ promptLLMResponse_splits ]
+        logger.info(f">>>>>>>> <> promptLLMResponses: {promptLLMResponses}")
 
         notices = []
         for i in range(len(promptLLMResponses)):
