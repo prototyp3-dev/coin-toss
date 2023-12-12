@@ -96,21 +96,21 @@ def handle_advance(data):
         promptLLMResponse = [promptLLMResponse1,promptLLMResponse2]
 
         logger.info(f">>>>>>>> <> promptLLMResponses: {promptLLMResponse}")
-        notice = {
-            "conversationId": conversationId,
-            "promptAuthor": promptAuthor_addr,
-            "promptInput": promptInput,
-            "promptLLMResponseNumber": 0,
-            "promptLLMResponseSplit": 0,
-            "promptLLMResponse": promptLLMResponse
-        }
+        # notice = {
+        #     "conversationId": conversationId,
+        #     "promptAuthor": promptAuthor_addr,
+        #     "promptInput": promptInput,
+        #     "promptLLMResponseNumber": 0,
+        #     "promptLLMResponseSplit": 0,
+        #     "promptLLMResponse": promptLLMResponse
+        # }
 
-        logger.info(f">>>>>>>nnnnn111> <> notice: {notice}")
-        post("notice", {"payload": str2hex(json.dumps(notice))})
+        # logger.info(f">>>>>>>nnnnn111> <> notice: {notice}")
+        # post("notice", {"payload": str2hex(json.dumps(notice))})
 
-        voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponse])
-        voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
-        post("voucher", voucher)
+        # voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponse])
+        # voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
+        # post("voucher", voucher)
 
         promptLLMResponses = []
         n_responses = 1
