@@ -131,12 +131,10 @@ def handle_advance(data):
                             "conversationId": conversationId,
                             "promptAuthor": promptAuthor_addr,
                             "promptInput": promptInput,
-                            # "promptLLMResponseNumber": 0,
-                            # "promptLLMResponseSplit": 0,
                             "promptLLMResponseNumber": i,
                             "promptLLMResponseSplit": j,
-                            "promptLLMResponse": promptLLMResponse
-                            # "promptLLMResponse": promptLLMResponses[i][j]
+                            # "promptLLMResponse": promptLLMResponse
+                            "promptLLMResponse": promptLLMResponses[i][j]
                         }
                 logger.info(f">>>>>>>nnnnnspsp> <> notice: {notice}")
                 post("notice", {"payload": str2hex(json.dumps(notice))})
