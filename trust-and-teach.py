@@ -143,13 +143,14 @@ def handle_advance(data):
                 notices += [ notice ]
 
                 # voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponses])
+                voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponse])
                 # # voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponses[i][j]])
-                # voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
-                # post("voucher", voucher)
+                voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
+                post("voucher", voucher)
 
-        voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponse])
-        voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
-        post("voucher", voucher)
+        # voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponse])
+        # voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
+        # post("voucher", voucher)
 
     except Exception as e:
         status = "reject"
