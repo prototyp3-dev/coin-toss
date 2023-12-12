@@ -105,7 +105,7 @@ def handle_advance(data):
             # split the response into a list of strings of 512 characters
             promptLLMResponse_splits = [promptLLMResponse_whole[0][i:i+response_split_length] for i in range(0, len(promptLLMResponse_whole[0]), response_split_length)]
             promptLLMResponses += [ promptLLMResponse_splits ]
-        # promptLLMResponses = "prmptrspppIUJysujqZCECgzAmhuEIUirpeTiEZQoWdqxOiDlH"
+        promptLLMResponseString = "prmptrspppIUJysujqZCECgzAmhuEIUirpeTiEZQoWdqxOiDlH"
         logger.info(f">>>>>>>[]> <> promptLLMResponses: {promptLLMResponses}")
         logger.info(f">>>>>>>00> <> promptLLMResponses: {promptLLMResponses[0][0]}")
 
@@ -120,16 +120,17 @@ def handle_advance(data):
                             "promptLLMResponseNumber": i,
                             "promptLLMResponseSplit": j,
                             # "promptLLMResponse": promptLLMResponse
+                            "promptLLMResponse": promptLLMResponseString
                             # "promptLLMResponse": promptLLMResponse[0]
-                            "promptLLMResponse": promptLLMResponses[i][j]
+                            # "promptLLMResponse": promptLLMResponses[i][j]
                         }
                 logger.info(f">>>>>>>nnnnnspsp> <> notice: {notice}")
                 post("notice", {"payload": str2hex(json.dumps(notice))})
                 notices += [ notice ]
 
-                # voucher_payload = announcePromptResponse + encode_abi(["uint256", "uint256", "uint256", "string"], [conversationId, i, j, promptLLMResponse[i][j]])
-                # voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
-                # post("voucher", voucher)
+                voucher_payload = announcePromptResponse + encode_abi(["uint256", "uint256", "uint256", "string"], [conversationId, i, j, promptLLMResponse[i][j]])
+                voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
+                post("voucher", voucher)
 
     except Exception as e:
         status = "reject"
