@@ -112,39 +112,39 @@ def handle_advance(data):
         voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
         post("voucher", voucher)
 
-        promptLLMResponses = []
-        n_responses = 1
-        response_split_length = 512
-        for i in range(n_responses):
-            promptLLMResponse_whole = [submitPrompt(promptInput)]
-            # split the response into a list of strings of 512 characters
-            promptLLMResponse_splits = [promptLLMResponse_whole[0][i:i+response_split_length] for i in range(0, len(promptLLMResponse_whole[0]), response_split_length)]
-            promptLLMResponses += [ promptLLMResponse_splits ]
-        logger.info(f">>>>>>>[]> <> promptLLMResponses: {promptLLMResponses}")
-        logger.info(f">>>>>>>00> <> promptLLMResponses: {promptLLMResponses[0][0]}")
+        # promptLLMResponses = []
+        # n_responses = 1
+        # response_split_length = 512
+        # for i in range(n_responses):
+        #     promptLLMResponse_whole = [submitPrompt(promptInput)]
+        #     # split the response into a list of strings of 512 characters
+        #     promptLLMResponse_splits = [promptLLMResponse_whole[0][i:i+response_split_length] for i in range(0, len(promptLLMResponse_whole[0]), response_split_length)]
+        #     promptLLMResponses += [ promptLLMResponse_splits ]
+        # logger.info(f">>>>>>>[]> <> promptLLMResponses: {promptLLMResponses}")
+        # logger.info(f">>>>>>>00> <> promptLLMResponses: {promptLLMResponses[0][0]}")
 
-        notices = []
-        for i in range(len(promptLLMResponses)):
-            for j in range(len(promptLLMResponses[i])):
-                notice = {
-                            "conversationId": conversationId,
-                            "promptAuthor": promptAuthor_addr,
-                            "promptInput": promptInput,
-                            "promptLLMResponseNumber": 0,
-                            "promptLLMResponseSplit": 0,
-                            "promptLLMResponse": promptLLMResponse
-                            # "promptLLMResponseNumber": i,
-                            # "promptLLMResponseSplit": j,
-                            # "promptLLMResponse": promptLLMResponses[i][j]
-                        }
-                logger.info(f">>>>>>>nnnnnspsp> <> notice: {notice}")
-                post("notice", {"payload": str2hex(json.dumps(notice))})
-                notices += [ notice ]
+        # notices = []
+        # for i in range(len(promptLLMResponses)):
+        #     for j in range(len(promptLLMResponses[i])):
+        #         notice = {
+        #                     "conversationId": conversationId,
+        #                     "promptAuthor": promptAuthor_addr,
+        #                     "promptInput": promptInput,
+        #                     "promptLLMResponseNumber": 0,
+        #                     "promptLLMResponseSplit": 0,
+        #                     "promptLLMResponse": promptLLMResponse
+        #                     # "promptLLMResponseNumber": i,
+        #                     # "promptLLMResponseSplit": j,
+        #                     # "promptLLMResponse": promptLLMResponses[i][j]
+        #                 }
+        #         logger.info(f">>>>>>>nnnnnspsp> <> notice: {notice}")
+        #         post("notice", {"payload": str2hex(json.dumps(notice))})
+        #         notices += [ notice ]
 
-                voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponses])
-                # voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponses[i][j]])
-                voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
-                post("voucher", voucher)
+        #         voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponses])
+        #         # voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponses[i][j]])
+        #         voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
+        #         post("voucher", voucher)
 
     except Exception as e:
         status = "reject"
