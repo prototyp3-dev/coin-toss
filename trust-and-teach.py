@@ -99,14 +99,20 @@ def handle_advance(data):
             promptLLMResponse_splits = [promptLLMResponse_whole[0][i:i+response_split_length] for i in range(0, len(promptLLMResponse_whole[0]), response_split_length)]
             promptLLMResponses += [ promptLLMResponse_splits ]
 
-        notice = {
-            "conversationId": conversationId,
-            "promptAuthor": promptAuthor_addr,
-            "promptInput": promptInput,
-            "promptLLMResponse": promptLLMResponses[0][0]
-        }
+        notices = []
+        for i in range(len(promptLLMResponses)):
+            for j in range(len(promptLLMResponses[i])):
+                notice = {
+                            "conversationId": conversationId,
+                            "promptAuthor": promptAuthor_addr,
+                            "promptInput": promptInput,
+                            "promptLLMResponseNumber": i,
+                            "promptLLMResponseSplit": j,
+                            "promptLLMResponse": promptLLMResponses[i][j]
+                        }
+                post("notice", {"payload": str2hex(json.dumps(notice))})
+                notices += [ notice ]
 
-        post("notice", {"payload": str2hex(json.dumps(notice))})
 
         voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponses[0][0]])
         voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
