@@ -58,8 +58,9 @@ def submitPrompt(input):
     # PROMPT_CMD = PROMPT_CMD_head + input + PROMPT_CMD_tail
     # PROMPT_CMD = "echo 'prompt response'"
     prompt_length_prefix = "prmptrsppp"
-    prompt_length = 750
+    # prompt_length = 750
     # prompt_length = 1000
+    prompt_length = 2000
     # prompt_length_prefix length
     prompt_length = prompt_length - len(prompt_length_prefix)
     random_sting = ''.join(random.choice(string.ascii_letters + ' ') for i in range(prompt_length))
@@ -89,20 +90,25 @@ def handle_advance(data):
         conversationId, promptInput = decode_abi(['uint256', 'string'], binary)
         logger.info(f"Received promptInput: {promptInput}, from conversationId: {conversationId}")
 
-        promptLLMResponse1 = submitPrompt(promptInput)
-        promptLLMResponse2 = submitPrompt(promptInput)
-        promptLLMResponse = [promptLLMResponse1,promptLLMResponse2]
+        promptLLMResponses = []
+        n_responses = 2
+        response_split_length = 512
+        for i in range(n_responses):
+            promptLLMResponse_whole = [submitPrompt(promptInput)]
+            # split the response into a list of strings of 512 characters
+            promptLLMResponse_splits = [promptLLMResponse_whole[0][i:i+response_split_length] for i in range(0, len(promptLLMResponse_whole[0]), response_split_length)]
+            promptLLMResponses += [ promptLLMResponse_splits ]
 
         notice = {
             "conversationId": conversationId,
             "promptAuthor": promptAuthor_addr,
             "promptInput": promptInput,
-            "promptLLMResponse": promptLLMResponse
+            "promptLLMResponse": promptLLMResponses[0][0]
         }
 
         post("notice", {"payload": str2hex(json.dumps(notice))})
 
-        voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponse])
+        voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponses[0][0]])
         voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
         post("voucher", voucher)
 
