@@ -100,9 +100,12 @@ def handle_advance(data):
             "conversationId": conversationId,
             "promptAuthor": promptAuthor_addr,
             "promptInput": promptInput,
+            "promptLLMResponseNumber": 0,
+            "promptLLMResponseSplit": 0,
             "promptLLMResponse": promptLLMResponse
         }
 
+        logger.info(f">>>>>>>nnnnn111> <> notice: {notice}")
         post("notice", {"payload": str2hex(json.dumps(notice))})
 
         voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponse])
@@ -117,7 +120,8 @@ def handle_advance(data):
             # split the response into a list of strings of 512 characters
             promptLLMResponse_splits = [promptLLMResponse_whole[0][i:i+response_split_length] for i in range(0, len(promptLLMResponse_whole[0]), response_split_length)]
             promptLLMResponses += [ promptLLMResponse_splits ]
-        logger.info(f">>>>>>>> <> promptLLMResponses: {promptLLMResponses}")
+        logger.info(f">>>>>>>[]> <> promptLLMResponses: {promptLLMResponses}")
+        logger.info(f">>>>>>>00> <> promptLLMResponses: {promptLLMResponses[0][0]}")
 
         notices = []
         for i in range(len(promptLLMResponses)):
@@ -126,14 +130,19 @@ def handle_advance(data):
                             "conversationId": conversationId,
                             "promptAuthor": promptAuthor_addr,
                             "promptInput": promptInput,
-                            "promptLLMResponseNumber": i,
-                            "promptLLMResponseSplit": j,
-                            "promptLLMResponse": promptLLMResponses[i][j]
+                            "promptLLMResponseNumber": 0,
+                            "promptLLMResponseSplit": 0,
+                            "promptLLMResponse": promptLLMResponse
+                            # "promptLLMResponseNumber": i,
+                            # "promptLLMResponseSplit": j,
+                            # "promptLLMResponse": promptLLMResponses[i][j]
                         }
+                logger.info(f">>>>>>>nnnnnspsp> <> notice: {notice}")
                 post("notice", {"payload": str2hex(json.dumps(notice))})
                 notices += [ notice ]
 
-                voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponses[i][j]])
+                voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponses])
+                # voucher_payload = announcePromptResponse + encode_abi(["uint256", "string[]"], [conversationId, promptLLMResponses[i][j]])
                 voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
                 post("voucher", voucher)
 
