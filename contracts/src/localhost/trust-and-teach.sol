@@ -20,6 +20,8 @@ contract TrustAndTeach {
     struct Conversation {
         address author;
         string prompt;
+        // uint256 responsesCount;
+        // mapping(uint256 => uint256) responseSplitsCount;
         // mapping(uint256 => mapping(uint256 => string)) responses;
         string[][] responses;
         uint256 rankSubmissionCount;
@@ -74,7 +76,7 @@ contract TrustAndTeach {
         uint256 conversation_id,
         uint256 iResponse,
         uint256 iSplitResponse,
-        string memory response
+        string memory splitResponse
     ) public {
         // require(msg.sender == L2_DAPP);
         require(
@@ -83,18 +85,30 @@ contract TrustAndTeach {
         );
         // require(iResponse <= num_responses, "invalid iResponse");
         // require(bytes(response).length != 0, "empty response");
-        Conversation storage conversation = conversations[conversation_id];
+        // Conversation storage conversation = conversations[conversation_id];
         // require(
         //     iSplitResponse < conversation.responses[iResponse].length,
         //     "iSplitResponse out of bounds"
         // );
-        conversation.responses[iResponse][iSplitResponse] = response;
+        // conversation.responses[iResponse][iSplitResponse] = response;
+        // conversation.responseAnnouncedTimestamp = block.timestamp;
+
+        // add splitResponse to conversation. create new elements if they don't exist. check existance by checking iResponse and iSplitResponse against the indeces of the responses array
+        Conversation storage conversation = conversations[conversation_id];
+        if (iResponse >= conversation.responses.length) {
+          conversation.responses.push();
+        }
+        if (iSplitResponse >= conversation.responses[iResponse].length) {
+            conversation.responses[iResponse].push();
+        }
+        conversation.responses[iResponse][iSplitResponse] = splitResponse;
         conversation.responseAnnouncedTimestamp = block.timestamp;
+
         emit PromptResponseAnnounced(
             conversation_id,
             iResponse,
             iSplitResponse,
-            response
+            splitResponse
         );
     }
 
@@ -105,7 +119,7 @@ contract TrustAndTeach {
         returns (uint256)
     {
         Conversation storage conversation = conversations[conversation_id];
-        return conversation.responses.length;
+        return conversation.responsesCount;
     }
 
     // get conversation #id response length
