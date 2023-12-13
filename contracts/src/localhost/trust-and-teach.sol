@@ -118,8 +118,8 @@ contract TrustAndTeach {
         view
         returns (uint256)
     {
-        Conversation storage conversation = conversations[conversation_id];
-        return conversation.responsesCount;
+      Conversation storage conversation = conversations[conversation_id];
+      return conversation.responses.length;
     }
 
     // get conversation #id response length
