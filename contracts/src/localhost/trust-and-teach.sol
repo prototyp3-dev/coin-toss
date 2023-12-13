@@ -77,19 +77,16 @@ contract TrustAndTeach {
         string memory response
     ) public {
         // require(msg.sender == L2_DAPP);
-        require(
-            conversation_id <= current_conversation_id,
-            "invalid conversation id, too high"
-        );
+        // require(conversation_id <= current_conversation_id, "invalid conversation id, too high");
         // require(iResponse <= num_responses, "invalid iResponse");
         // require(bytes(response).length != 0, "empty response");
-        Conversation storage conversation = conversations[conversation_id];
+        // Conversation storage conversation = conversations[conversation_id];
         // require(
         //     iSplitResponse < conversation.responses[iResponse].length,
         //     "iSplitResponse out of bounds"
         // );
-        conversation.responses[iResponse][iSplitResponse] = response;
-        conversation.responseAnnouncedTimestamp = block.timestamp;
+        // conversation.responses[iResponse][iSplitResponse] = response;
+        // conversation.responseAnnouncedTimestamp = block.timestamp;
         emit PromptResponseAnnounced(
             conversation_id,
             iResponse,
@@ -216,10 +213,5 @@ contract TrustAndTeach {
 
     event RankSubmitted(uint256 conversation_id, address user, uint256[] ranks);
     event PromptSent(uint256 conversation_id, string prompt);
-    event PromptResponseAnnounced(
-        uint256 conversation_id,
-        uint256 iResponse,
-        uint256 iSplitResponse,
-        string response
-    );
+    event PromptResponseAnnounced(uint256 conversation_id, uint256 iResponse, uint256 iSplitResponse, string response);
 }
