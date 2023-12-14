@@ -80,7 +80,7 @@ contract TrustAndTeach {
             conversation_id <= current_conversation_id,
             "invalid conversation id, too high"
         );
-        // Conversation storage conversation = conversations[conversation_id];
+        Conversation storage conversation = conversations[conversation_id];
         // require(
         //     iResponse <= conversation.responses.length,
         //     "invalid iResponse"
