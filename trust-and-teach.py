@@ -93,7 +93,7 @@ def handle_advance(data):
 
 
         promptLLMResponses = []
-        n_responses = 2
+        n_responses = 1
         response_split_length = 512
         for i in range(n_responses):
             promptLLMResponse_whole = [submitPrompt(promptInput)]
