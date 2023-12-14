@@ -102,6 +102,7 @@ def handle_advance(data):
             promptLLMResponses += [ promptLLMResponse_splits ]
         promptLLMResponseString = "prmptrspppIUJysujqZCECgzAmhuEIUirpeTiEZQoWdqxOiDlH"
         logger.info(f">>>>>>>[]> <> promptLLMResponses: {promptLLMResponses}")
+        logger.info(f">>>>>>>[....]> <> promptLLMResponses: {promptLLMResponseString}")
         logger.info(f">>>>>>>00> <> promptLLMResponses: {promptLLMResponses[0][0]}")
 
         notices = []
@@ -114,16 +115,16 @@ def handle_advance(data):
                             "promptInput": promptInput,
                             "promptLLMResponseNumber": i,
                             "promptLLMResponseSplit": j,
-                            "promptLLMResponse": promptLLMResponseString
+                            # "promptLLMResponse": promptLLMResponseString
                             # "promptLLMResponse": promptLLMResponse[0]
-                            # "promptLLMResponse": promptLLMResponses[i][j]
+                            "promptLLMResponse": promptLLMResponses[i][j]
                         }
                 logger.info(f">>>>>>>nnnnnspsp> <> notice: {notice}")
                 post("notice", {"payload": str2hex(json.dumps(notice))})
                 notices += [ notice ]
 
-                voucher_payload = announcePromptResponse + encode_abi(["uint256", "uint256", "uint256", "string"], [conversationId, i, j, promptLLMResponseString])
-                # voucher_payload = announcePromptResponse + encode_abi(["uint256", "uint256", "uint256", "string"], [conversationId, i, j, promptLLMResponse[i][j]])
+                # voucher_payload = announcePromptResponse + encode_abi(["uint256", "uint256", "uint256", "string"], [conversationId, i, j, promptLLMResponseString])
+                voucher_payload = announcePromptResponse + encode_abi(["uint256", "uint256", "uint256", "string"], [conversationId, i, j, promptLLMResponse[i][j]])
                 voucher = {"destination": promptAuthor_addr, "payload": "0x" + voucher_payload.hex()}
                 post("voucher", voucher)
 
