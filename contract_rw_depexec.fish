@@ -11,6 +11,7 @@ function test_cartesi_voucher
   echo "======== $_flag_p "
   set logfile $_flag_path"test.log"
   echo "**** logfile: $logfile" &|tee -a $logfile
+  git log -n 2 &|tee -a $logfile
   if not docker version >/dev/null
     echo "docker isn't running :-("  &| tee -a $logfile
     return
