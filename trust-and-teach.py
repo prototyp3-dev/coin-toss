@@ -115,6 +115,7 @@ def handle_advance(data):
                             "promptLLMResponseNumber": i,
                             "promptLLMResponseSplit": j,
                             "promptLLMResponse": promptLLMResponseString
+                            # "promptLLMResponse": promptLLMResponse[0]
                             # "promptLLMResponse": promptLLMResponses[i][j]
                         }
                 logger.info(f">>>>>>>nnnnnspsp> <> notice: {notice}")
