@@ -57,7 +57,7 @@ contract TrustAndTeach {
         public
     {
         bytes memory payload = abi.encode(conversation_id, prompt);
-        inputBox.addInput(L2_DAPP, payload); // this line gives an error :-(
+        inputBox.addInput(L2_DAPP, payload);
     }
 
     function getPromptByConversationId(uint256 conversation_id)
@@ -81,14 +81,14 @@ contract TrustAndTeach {
             "invalid conversation id, too high"
         );
         Conversation storage conversation = conversations[conversation_id];
-        require(
-            iResponse <= conversation.responses.length,
-            "invalid iResponse"
-        );
-        require(
-            iSplitResponse == conversation.responses[iResponse].length,
-            "invalid iSplitResponse"
-        );
+        // require(
+        //     iResponse <= conversation.responses.length,
+        //     "invalid iResponse"
+        // );
+        // require(
+        //     iSplitResponse == conversation.responses[iResponse].length,
+        //     "invalid iSplitResponse"
+        // );
         if (iResponse == conversation.responses.length) {
             conversation.responses.push();
         }
