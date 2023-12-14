@@ -20,9 +20,6 @@ contract TrustAndTeach {
     struct Conversation {
         address author;
         string prompt;
-        // uint256 responsesCount;
-        // mapping(uint256 => uint256) responseSplitsCount;
-        // mapping(uint256 => mapping(uint256 => string)) responses;
         string[][] responses;
         uint256 rankSubmissionCount;
         mapping(address => RankSubmission) rankSubmissions;
@@ -83,27 +80,23 @@ contract TrustAndTeach {
             conversation_id <= current_conversation_id,
             "invalid conversation id, too high"
         );
-        // require(iResponse <= num_responses, "invalid iResponse");
-        // require(bytes(response).length != 0, "empty response");
-        // Conversation storage conversation = conversations[conversation_id];
-        // require(
-        //     iSplitResponse < conversation.responses[iResponse].length,
-        //     "iSplitResponse out of bounds"
-        // );
-        // conversation.responses[iResponse][iSplitResponse] = response;
-        // conversation.responseAnnouncedTimestamp = block.timestamp;
-
-        // add splitResponse to conversation. create new elements if they don't exist. check existance by checking iResponse and iSplitResponse against the indeces of the responses array
         Conversation storage conversation = conversations[conversation_id];
+        require(
+            iResponse <= conversation.responses.length,
+            "invalid iResponse"
+        );
+        require(
+            iSplitResponse == conversation.responses[iResponse].length,
+            "invalid iSplitResponse"
+        );
         if (iResponse == conversation.responses.length) {
-          conversation.responses.push();
+            conversation.responses.push();
         }
         if (iSplitResponse == conversation.responses[iResponse].length) {
             conversation.responses[iResponse].push();
         }
         conversation.responses[iResponse][iSplitResponse] = splitResponse;
         conversation.responseAnnouncedTimestamp = block.timestamp;
-
         emit PromptResponseAnnounced(
             conversation_id,
             iResponse,
@@ -118,8 +111,8 @@ contract TrustAndTeach {
         view
         returns (uint256)
     {
-      Conversation storage conversation = conversations[conversation_id];
-      return conversation.responses.length;
+        Conversation storage conversation = conversations[conversation_id];
+        return conversation.responses.length;
     }
 
     // get conversation #id response length
