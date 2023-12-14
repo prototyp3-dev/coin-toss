@@ -95,10 +95,10 @@ contract TrustAndTeach {
 
         // add splitResponse to conversation. create new elements if they don't exist. check existance by checking iResponse and iSplitResponse against the indeces of the responses array
         Conversation storage conversation = conversations[conversation_id];
-        if (iResponse >= conversation.responses.length) {
+        if (iResponse == conversation.responses.length) {
           conversation.responses.push();
         }
-        if (iSplitResponse >= conversation.responses[iResponse].length) {
+        if (iSplitResponse == conversation.responses[iResponse].length) {
             conversation.responses[iResponse].push();
         }
         conversation.responses[iResponse][iSplitResponse] = splitResponse;
