@@ -107,14 +107,10 @@ function test_cartesi_voucher
       # yarn && yarn build
       yarn start notice list &| tee -a $logfile
       yarn start voucher list &| tee -a $logfile
-      yarn start voucher execute --index 0 --input 0 &| tee -a $logfile
-      yarn start voucher execute --index 1 --input 0 &| tee -a $logfile
-      yarn start voucher execute --index 2 --input 0 &| tee -a $logfile
-      yarn start voucher execute --index 3 --input 0 &| tee -a $logfile
-      yarn start voucher execute --index 4 --input 0 &| tee -a $logfile
-      yarn start voucher execute --index 5 --input 0 &| tee -a $logfile
-      yarn start voucher execute --index 6 --input 0 &| tee -a $logfile
-      yarn start voucher execute --index 7 --input 0 &| tee -a $logfile
+      set voucherTotal ( yarn start voucher list &| tee -a $logfile | jq ".| length")
+      for iVoucher in (seq 1 $voucherTotal)
+        yarn start voucher execute --index $iVoucher --input 0 &| tee -a $logfile
+      end
       cd -
 
       curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[864010]}' http://localhost:8545

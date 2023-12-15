@@ -111,7 +111,9 @@ def handle_advance(data):
                             "conversationId": conversationId,
                             "promptAuthor": promptAuthor_addr,
                             "promptInput": promptInput,
+                            "promptLLMResponseTotal": len(promptLLMResponses),
                             "promptLLMResponseNumber": i,
+                            "promptLLMResponseSplitTotal": len(promptLLMResponses[i]),
                             "promptLLMResponseSplit": j,
                             "promptLLMResponse": promptLLMResponses[i][j]
                         }
