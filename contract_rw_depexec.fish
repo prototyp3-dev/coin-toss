@@ -106,6 +106,8 @@ function test_cartesi_voucher
       cd ../rollups-examples/frontend-console/
       # yarn && yarn build
       yarn start notice list &| tee -a $logfile
+      set notice_1st_payload (yarn start notice list | jq .[1]."payload" | jq -r)
+      set responsesTotal (echo $notice_1st_payload | jq  '.promptLLMResponseTotal')
       yarn start voucher list &| tee -a $logfile
       set voucherTotal ( yarn start voucher list &| tee -a $logfile | sed -n '4p' | jq ".| length")
       for iVoucher in (seq 0 ( math $voucherTotal -1 ))
