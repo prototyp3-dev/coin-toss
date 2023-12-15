@@ -109,6 +109,8 @@ function test_cartesi_voucher
       yarn start voucher list &| tee -a $logfile
       yarn start voucher execute --index 0 --input 0 &| tee -a $logfile
       yarn start voucher execute --index 1 --input 0 &| tee -a $logfile
+      yarn start voucher execute --index 2 --input 0 &| tee -a $logfile
+      yarn start voucher execute --index 3 --input 0 &| tee -a $logfile
       cd -
 
       curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[864010]}' http://localhost:8545
