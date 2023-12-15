@@ -107,7 +107,7 @@ function test_cartesi_voucher
       # yarn && yarn build
       yarn start notice list &| tee -a $logfile
       yarn start voucher list &| tee -a $logfile
-      set voucherTotal ( yarn start voucher list &| tee -a $logfile | jq ".| length")
+      set voucherTotal ( yarn start voucher list &| tee -a $logfile | sed -n '4p' | jq ".| length")
       for iVoucher in (seq 1 $voucherTotal)
         yarn start voucher execute --index $iVoucher --input 0 &| tee -a $logfile
       end
