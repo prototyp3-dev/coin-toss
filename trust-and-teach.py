@@ -58,8 +58,8 @@ def submitPrompt(input):
     # PROMPT_CMD = PROMPT_CMD_head + input + PROMPT_CMD_tail
     # PROMPT_CMD = "echo 'prompt response'"
     prompt_length_prefix = "prmptrsppp"
-    prompt_length = 50
-    # prompt_length = 750
+    # prompt_length = 50
+    prompt_length = 750
     # prompt_length = 1000
     # prompt_length = 2000
     # prompt_length_prefix length
