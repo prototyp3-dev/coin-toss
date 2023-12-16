@@ -1,7 +1,7 @@
 #!/usr/bin/env fish
 # set -x
 set fish_trace 1
-source  ./contract_rw_vars.fish
+source  ../contract_rw_vars.fish
 
 # print hello
 
@@ -11,6 +11,7 @@ function test_cartesi_voucher
   echo "======== $_flag_p "
   set logfile $_flag_path"test.log"
   echo "**** logfile: $logfile" &|tee -a $logfile
+  git log -n 2 &|tee -a $logfile
   if not docker version >/dev/null
     echo "docker isn't running :-("  &| tee -a $logfile
     return
@@ -59,13 +60,10 @@ function test_cartesi_voucher
     if test $decimal_number -gt $cut_off_block_load
       echo "Block number is $decimal_number, which is greater than $cut_off_block."
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"set_dapp_address(address)\" $DAPP_ADDRESS"
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"play(address)\" $PLAYER2"
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER2_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"play(address)\" $PLAYER1"
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"play(address,string)\" $PLAYER2 \"hi\""
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $player2_private_key --rpc-url $rpc_url $coin_toss_address \"play(address,string)\" $player1 \"byr\""
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"sendInstructionPrompt(string)\" \"heeeeieeeyy\""
-      echo "+++++ conversations: "
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"current_conversation_id()\""
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"sendInstructionPrompt(string)\" \"When Veritatis magni in ipsam, deserunt alias provident odit illo accusamus minus iusto, earum accusantium laboriosam officiis iste possimus nihil obcaecati? Voluptatum omnis rerum nisi adipisci qui nesciunt ad quidem repellat, molestias ea odit? Voluptas corrupti illum necessitatibus odio repudiandae nesciunt ipsam nisi itaque, laudantium optio cum sed corporis magnam, eius nostrum distinctio pariatur ad nihil ducimus sequi consectetur incidunt cupiditate quas. Omnis quos ab nisi officia consectetur fuga aspernatur officiis illo, assumenda voluptatem adipisci nam quaerat illum aliquam eum rem, sit ea quos sed natus officiis fugit nesciunt doloribus quia, voluptatem delectus unde optio magni ea? Dolore velit odit reprehenderit dolorum animi sed aperiam inventore, qui maxime voluptas illo, praesentium fugiat aliquid incidunt repellat repudiandae harum at aliquam voluptatibus, obcaecati sint velit itaque labore est odio sequi. Neque voluptatum qui impedit similique earum sequi, quo nesciunt veniam asperiores? Enim dolor numquam est explicabo, dolorum impedit perferendis natus quisquam, saepe earum quasi quis temporibus tempore necessitatibus. Explicabo aspernatur laudantium at sint mollitia quisquam eaque facilis, magni alias quos accusantium ab quidem illum non, eius ducimus velit a nisi quisquam at. \""
+      echo "+++++ conversations count: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"current_conversation_id()\"" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"current_conversation_id()\"" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
       curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[864010]}' http://localhost:8545
       curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[864010]}' http://localhost:8545
       break
@@ -108,13 +106,73 @@ function test_cartesi_voucher
       cd ../rollups-examples/frontend-console/
       # yarn && yarn build
       yarn start notice list &| tee -a $logfile
+      set notice_1st_payload (yarn start notice list | jq .[1]."payload" | jq -r)
+      set responsesTotal (echo $notice_1st_payload | jq  '.promptLLMResponseTotal')
+      yarn start notice list | jq .[1:length] | jq .[]."payload" | jq -r | jq  '{promptLLMResponseNumber, promptLLMResponseSplit} | map (tostring) | join(" ")' | tr -d \"
+      ubuntu@ip-172-31-7-92 ~/p/t/r/frontend-console (main)> set tmmp (yarn start notice list | sed -n '4p' | jq .[1:length] | jq .[]."payload" | jq -r | jq  '{promptLLMResponseNumber, promptLLMResponseSplit} | map (tostring) | join(" ")' | tr \n " ")
       yarn start voucher list &| tee -a $logfile
-      yarn start voucher execute --index 0 --input 0 &| tee -a $logfile
+      set voucherTotal ( yarn start voucher list &| tee -a $logfile | sed -n '4p' | jq ".| length")
+      for iVoucher in (seq 0 ( math $voucherTotal -1 ))
+        yarn start voucher execute --index $iVoucher --input 0 &| tee -a $logfile
+      end
       cd -
 
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"last_game()\""
+      curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[864010]}' http://localhost:8545
+      curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[864010]}' http://localhost:8545
+
+      echo "+++++ conversation by ID: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationById(uint256)\" 0" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationById(uint256)\" 0"  | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      echo "+++++ prompt for conversation 0: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getPromptByConversationId(uint256)\" 0" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getPromptByConversationId(uint256)\" 0" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      echo "+++++ conversation 0 responses count: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseCount(uint256)\" 0" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseCount(uint256)\" 0"  | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      echo "+++++ conversation 0 response 0 splits count: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseLength(uint256,uint256)\" 0 0" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseLength(uint256,uint256)\" 0 0" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      echo "+++++ conversations responses splits " &| tee -a $logfile
+      echo "+++++ conversation 0 response 0 split 0: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 0" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 0" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      echo "+++++ conversation 0 response 0 split 1: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 1" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 1" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      echo "+++++ conversation 0 response 0 split 1: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 2" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 2" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      echo "+++++ conversation 0 response 0 split 1: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 3" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 3" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      echo "+++++ conversation 0 response 1 split 0: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 1 0" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 1 0" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      echo "+++++ conversation 0 response 1 split 1: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 1 1" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 1 1" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+
+      # Submitting ranks for conversation 0
+      echo "+++++ submitting ranks for conversation 0: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"submitRank(uint256,uint256[])\" 0 [1,0]" &| tee -a $logfile
+
+      # Retrieving and outputting users who submitted ranks for conversation 0
+      echo "+++++ retrieving users who submitted ranks for conversation 0: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getUsersWhoSubmittedRanks(uint256)\" 0" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getUsersWhoSubmittedRanks(uint256)\" 0" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+
+      # Retrieving ranks submitted by PLAYER1 for conversation 0
+      echo "+++++ retrieving ranks submitted by $PLAYER1 for conversation 0: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRanksByUser(uint256,address)\" 0 $PLAYER1" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRanksByUser(uint256,address)\" 0 $PLAYER1" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      echo "+++++ retrieving rank 1 submitted by $PLAYER1 for conversation 0: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRankByUserAtIndex(uint256,address,uint256)\" 0 $PLAYER1 0" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRankByUserAtIndex(uint256,address,uint256)\" 0 $PLAYER1 0" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      echo "+++++ retrieving rank 2 submitted by $PLAYER1 for conversation 0: " &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRankByUserAtIndex(uint256,address,uint256)\" 0 $PLAYER1 1" &| tee -a $logfile
+      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getRankByUserAtIndex(uint256,address,uint256)\" 0 $PLAYER1 1" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
       docker compose -f docker-compose.yml -f docker-compose.override.yml down -v
-      docker images && docker ps -a --no-trunc &&  docker volume ls && docker network ls
+      # docker images && docker ps -a --no-trunc &&  docker volume ls && docker network ls
       break
     end
 
