@@ -24,7 +24,7 @@ function test_cartesi_voucher
   fish -c "docker compose -f docker-compose.yml -f docker-compose.override.yml up"&
 
   set rpc_server_tries_count 0
-  set rpc_server_tries_count_cutoff 5
+  set rpc_server_tries_count_cutoff 10
 
 
   while true
@@ -62,7 +62,7 @@ function test_cartesi_voucher
   end
 
   set db_server_tries_count 0
-  set db_server_tries_count_cutoff 5
+  set db_server_tries_count_cutoff 10
 
   while true
     echo "()()() after send while loop in: $logfile"
