@@ -90,10 +90,11 @@ function test_cartesi_voucher
       cd ../rollups-examples/frontend-console/
       # yarn && yarn build
       yarn start notice list &| tee -a $logfile
-      set notice_1st_payload (yarn start notice list | jq .[1]."payload" | jq -r)
-      set responsesTotal (echo $notice_1st_payload | jq  '.promptLLMResponseTotal')
-      yarn start notice list | jq .[1:length] | jq .[]."payload" | jq -r | jq  '{promptLLMResponseNumber, promptLLMResponseSplit} | map (tostring) | join(" ")' | tr -d \"
-      ubuntu@ip-172-31-7-92 ~/p/t/r/frontend-console (main)> set tmmp (yarn start notice list | sed -n '4p' | jq .[1:length] | jq .[]."payload" | jq -r | jq  '{promptLLMResponseNumber, promptLLMResponseSplit} | map (tostring) | join(" ")' | tr \n " ")
+      # set notice_1st_payload (yarn start notice list | jq .[1]."payload" | jq -r)
+      # set responsesTotal (echo $notice_1st_payload | jq  '.promptLLMResponseTotal')
+      # yarn start notice list | jq .[1:length] | jq .[]."payload" | jq -r | jq  '{promptLLMResponseNumber, promptLLMResponseSplit} | map (tostring) | join(" ")' | tr -d \"
+      set responses_and_splits_filename  (mktemp )
+      yarn start notice list | sed -n '4p' | jq .[1:length] | jq .[]."payload" | jq -r | jq  '{promptLLMResponseNumber, promptLLMResponseSplit} | map (tostring) | join(" ")' | tr -d \" > $responses_and_splits_filename
       yarn start voucher list &| tee -a $logfile
       set voucherTotal ( yarn start voucher list &| tee -a $logfile | sed -n '4p' | jq ".| length")
       for iVoucher in (seq 0 ( math $voucherTotal -1 ))
@@ -116,25 +117,13 @@ function test_cartesi_voucher
       echo "+++++ conversation 0 response 0 splits count: " &| tee -a $logfile
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseLength(uint256,uint256)\" 0 0" &| tee -a $logfile
       docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseLength(uint256,uint256)\" 0 0" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+
       echo "+++++ conversations responses splits " &| tee -a $logfile
-      echo "+++++ conversation 0 response 0 split 0: " &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 0" &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 0" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
-      echo "+++++ conversation 0 response 0 split 1: " &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 1" &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 1" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
-      echo "+++++ conversation 0 response 0 split 1: " &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 2" &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 2" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
-      echo "+++++ conversation 0 response 0 split 1: " &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 3" &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 0 3" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
-      echo "+++++ conversation 0 response 1 split 0: " &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 1 0" &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 1 0" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
-      echo "+++++ conversation 0 response 1 split 1: " &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 1 1" &| tee -a $logfile
-      docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 1 1" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      cat $responses_and_splits_filename | while read l
+        echo "+++++ conversation 0 response  split $l: " &| tee -a $logfile
+        docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 $l" &| tee -a $logfile
+        docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"getConversationResponseByIndex(uint256,uint256,uint256)\" 0 $l" | tr -d '\n'| cut -c 3- | xxd -p -r &| tee -a $logfile
+      end
 
       # Submitting ranks for conversation 0
       echo "+++++ submitting ranks for conversation 0: " &| tee -a $logfile
