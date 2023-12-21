@@ -30,7 +30,7 @@ k = keccak.new(digest_bits=256)
 announcePromptResponse = k.update(b'announcePromptResponse(uint256,uint256,uint256,string)').digest()[:4] # first 4 bytes
 
 # logger.info(f"HTTP rollup_server url is {rollup_server}")
-PROMPT_CMD_head = "./run stories15M.bin -t 0.8 -n 20 -i '"
+PROMPT_CMD_head = "./run stories15M.bin -t 0.8 -n 100 -i '"
 PROMPT_CMD_tail = "'; exit 0"
 
 def hex2str(hex):
@@ -97,9 +97,11 @@ def handle_advance(data):
         response_split_length = 512
         for i in range(n_responses):
             promptLLMResponse_whole = [submitPrompt(promptInput)]
+            logger.info(f"Prompt rrresponseee: {promptLLMResponse_whole[0]})
             # split the response into a list of strings of 512 characters
             promptLLMResponse_splits = [promptLLMResponse_whole[0][i:i+response_split_length] for i in range(0, len(promptLLMResponse_whole[0]), response_split_length)]
             promptLLMResponses += [ promptLLMResponse_splits ]
+
         logger.info(f">>>>>>>[]> <> promptLLMResponses: {promptLLMResponses}")
         logger.info(f">>>>>>>00> <> promptLLMResponses: {promptLLMResponses[0][0]}")
 
