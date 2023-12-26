@@ -70,9 +70,9 @@ def submitPrompt(input):
 
     promptResponse = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
     logger.info(f"kkkkk Prompt response: {promptResponse}")
-    PROMPT_CMD = "echo 'When the sun shone on the outside Little Joey and his mommy walked outside The sky was blue and the sun was shining brightly Little Joey was so excited that he ran outside to get a tasty ice cream coneMommy said Lets go to the ice cream shop Little Joey smiled and he ran as fast as he could to get his ice cream He reached the shop and chose his favorite flavor'"
-    promptResponse = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
-    logger.info(f"zzzzz Prompt response: {promptResponse}")
+    # PROMPT_CMD = "echo 'When the sun shone on the outside Little Joey and his mommy walked outside The sky was blue and the sun was shining brightly Little Joey was so excited that he ran outside to get a tasty ice cream coneMommy said Lets go to the ice cream shop Little Joey smiled and he ran as fast as he could to get his ice cream He reached the shop and chose his favorite flavor'"
+    # promptResponse = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
+    # logger.info(f"zzzzz Prompt response: {promptResponse}")
     return promptResponse
 
 
@@ -104,6 +104,7 @@ def handle_advance(data):
             logger.info(f"Prompt rrresponseee: {promptLLMResponse_whole[0]}")
             # split the response into a list of strings of 512 characters
             promptLLMResponse_splits = [promptLLMResponse_whole[0][i:i+response_split_length] for i in range(0, len(promptLLMResponse_whole[0]), response_split_length)]
+            logger.info(f"Prompt rrresssssponseee: {promptLLMResponse_splits}")
             promptLLMResponses += [ promptLLMResponse_splits ]
 
         logger.info(f">>>>>>>[]> <> promptLLMResponses: {promptLLMResponses}")
