@@ -55,7 +55,7 @@ def toss_coin(seed):
     return random.randint(0,1)
 
 def submitPrompt(input):
-    # PROMPT_CMD = PROMPT_CMD_head + input + PROMPT_CMD_tail
+    PROMPT_CMD = PROMPT_CMD_head + input + PROMPT_CMD_tail
     # PROMPT_CMD = "echo 'prompt response'"
     prompt_length_prefix = "prmptrsppp"
     # prompt_length = 50
@@ -65,10 +65,11 @@ def submitPrompt(input):
     # prompt_length_prefix length
     prompt_length = prompt_length - len(prompt_length_prefix)
     random_sting = ''.join(random.choice(string.ascii_letters + ' ') for i in range(prompt_length))
-    PROMPT_CMD = "echo '"+prompt_length_prefix+random_sting+"'"
-    logger.info(f"Prompt command: {PROMPT_CMD}")
+    # PROMPT_CMD = "echo '"+prompt_length_prefix+random_sting+"'"
+    logger.info(f"ttttt Prompt command: {PROMPT_CMD}")
 
     promptResponse = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
+    logger.info(f"kkkkk Prompt response: {promptResponse}")
     return promptResponse
 
 
