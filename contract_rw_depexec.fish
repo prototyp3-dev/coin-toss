@@ -91,6 +91,7 @@ function test_cartesi_voucher
     if test $decimal_number -gt $cut_off_block_interaction_wait
       cd ../rollups-examples/frontend-console/
       # yarn && yarn build
+      yarn start report list &| tee -a $logfile
       yarn start notice list &| tee -a $logfile
       # set notice_1st_payload (yarn start notice list | jq .[1]."payload" | jq -r)
       # set responsesTotal (echo $notice_1st_payload | jq  '.promptLLMResponseTotal')

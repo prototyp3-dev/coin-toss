@@ -30,7 +30,7 @@ k = keccak.new(digest_bits=256)
 announcePromptResponse = k.update(b'announcePromptResponse(uint256,uint256,uint256,string)').digest()[:4] # first 4 bytes
 
 # logger.info(f"HTTP rollup_server url is {rollup_server}")
-PROMPT_CMD_head = "./run stories15M.bin -t 0.8 -n 200 -i '"
+PROMPT_CMD_head = "./run stories15M.bin -t 0.8 -n 20 -i '"
 PROMPT_CMD_tail = "' | sed 's/[^a-zA-Z ]//g' ; exit 0"
 # PROMPT_CMD_tail = "' 2>/dev/null | sed 's/[^a-zA-Z ]//g' | tr -d \\n ; exit 0"
 
@@ -69,7 +69,7 @@ def submitPrompt(input):
     # PROMPT_CMD = "echo '"+prompt_length_prefix+random_sting+"'"
     logger.info(f"ttttt Prompt command: {PROMPT_CMD}")
 
-    promptResponse = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
+    promptResponse = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode() + random_sting
     logger.info(f"kkkkk Prompt response: {promptResponse}")
     # PROMPT_CMD = "echo 'When the sun shone on the outside Little Joey and his mommy walked outside The sky was blue and the sun was shining brightly Little Joey was so excited that he ran outside to get a tasty ice cream coneMommy said Lets go to the ice cream shop Little Joey smiled and he ran as fast as he could to get his ice cream He reached the shop and chose his favorite flavor'"
     # promptResponse = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
