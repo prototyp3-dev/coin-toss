@@ -87,7 +87,7 @@ function test_cartesi_voucher
     set decimal_number (math $hex_number)
     echo "Current block number is $decimal_number."
 
-    set cut_off_block_interaction_wait 38 # by this time, all should be loaded
+    set cut_off_block_interaction_wait 100 # by this time, all should be loaded
     if test $decimal_number -gt $cut_off_block_interaction_wait
       cd ../rollups-examples/frontend-console/
       # yarn && yarn build
