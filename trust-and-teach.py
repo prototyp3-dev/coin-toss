@@ -30,7 +30,7 @@ k = keccak.new(digest_bits=256)
 announcePromptResponse = k.update(b'announcePromptResponse(uint256,uint256,uint256,string)').digest()[:4] # first 4 bytes
 
 # logger.info(f"HTTP rollup_server url is {rollup_server}")
-PROMPT_CMD_head = "./run stories15M.bin -t 0.8 -n 20 -i '"
+PROMPT_CMD_head = "./run stories15M.bin -t 0.8 -n 100 -i '"
 PROMPT_CMD_tail = "' | sed 's/[^a-zA-Z ]//g' ; exit 0"
 # PROMPT_CMD_tail = "' 2>/dev/null | sed 's/[^a-zA-Z ]//g' | tr -d \\n ; exit 0"
 
