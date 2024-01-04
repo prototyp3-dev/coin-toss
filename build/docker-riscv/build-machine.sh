@@ -19,7 +19,7 @@ NETWORK=$2
 
 cartesi-machine \
     --assert-rolling-template \
-    --ram-length=26624Mi \
+    --ram-length=1024Mi \
     --rollup \
     --flash-drive=label:root,filename:dapp.ext2 \
     --ram-image=linux.bin \
