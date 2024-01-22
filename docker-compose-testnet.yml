@@ -76,7 +76,7 @@ services:
       SNAPSHOT_LATEST: /var/opt/cartesi/machine-snapshots/latest
 
   server_manager:
-    image: ${DAPP_IMAGE:-cartesi/dapp:coin-toss-devel-server}
+    image: ${DAPP_IMAGE:-cartesi/dapp:${DAPP_NAME:?undefined DAPP_NAME}-devel-server}
     restart: always
     healthcheck:
       test: [ "CMD-SHELL", "bash -c 'echo \"\" > /dev/tcp/127.0.0.1/5001;'" ]
