@@ -1,0 +1,209 @@
+ubuntu@ip-172-31-7-92 ~/p/t/coin-toss (ic10deploy) [18]> DAPP_NAME="trust-and-teach" docker compose --env-file env.sepolia -f
+ deploy-testnet.yml up
+[+] Building 1.3s (10/10) FINISHED                                                                            docker:default
+ => [dapp-deployer internal] load build definition from Dockerfile                                                      0.0s
+ => => transferring dockerfile: 189B                                                                                    0.0s
+ => [dapp-deployer internal] load .dockerignore                                                                         0.0s
+ => => transferring context: 2B                                                                                         0.0s
+ => [dapp-deployer] resolve image config for docker.io/docker/dockerfile:1.4                                            0.3s
+ => CACHED [dapp-deployer] docker-image://docker.io/docker/dockerfile:1.4@sha256:9ba7531bd80fb0a858632727cf7a112fbfd19  0.0s
+ => [dapp-deployer internal] load metadata for docker.io/cartesi/rollups-cli:1.0.0                                      0.0s
+ => [dapp-deployer 1/3] FROM docker.io/cartesi/rollups-cli:1.0.0                                                        0.0s
+ => [dapp-deployer internal] load build context                                                                         0.0s
+ => => transferring context: 520B                                                                                       0.0s
+ => [dapp-deployer 2/3] RUN apk update && apk add jq                                                                    0.8s
+ => [dapp-deployer 3/3] COPY deploy.sh .                                                                                0.0s
+ => [dapp-deployer] exporting to image                                                                                  0.0s
+ => => exporting layers                                                                                                 0.0s
+ => => writing image sha256:683c1ed74ecc996c8346153c216a135058db281df02339ea384658e88fbb7bd5                            0.0s
+ => => naming to docker.io/library/coin-toss-dapp-deployer                                                              0.0s
+[+] Running 6/5
+ ✔ Network coin-toss_default                 Created                                                                    0.1s
+ ✔ Volume "coin-toss_machine"                Created                                                                    0.0s
+ ✔ Container coin-toss-contracts-1           Created                                                                    0.5s
+ ✔ Container coin-toss-machine-1             Created                                                                   12.0s
+ ✔ Container coin-toss-authority-deployer-1  Created                                                                   11.6s
+ ✔ Container coin-toss-dapp-deployer-1       Created                                                                    0.0s
+Attaching to coin-toss-authority-deployer-1, coin-toss-contracts-1, coin-toss-dapp-deployer-1, coin-toss-machine-1
+coin-toss-machine-1             | 7728aa79fccace14798b7e3fccb88ece94be46850510cc18a0911509a13f9e75
+coin-toss-contracts-1           | Deploying CoinToss from coin-toss.sol on sepolia network.
+coin-toss-machine-1 exited with code 0
+coin-toss-contracts-1           | {
+coin-toss-contracts-1           |   "deployer": "0x5873298b68497fad590f68221D9a8d134902DE64",
+coin-toss-contracts-1           |   "deployedTo": "0xb1fEC5fe2d82A189eE793aE9a675eA4a7caC6e99",
+coin-toss-contracts-1           |   "transactionHash": "0x99f262c254f9258ca058391f327066a6d93038197d0a0da73d7cc788e440ba15"
+coin-toss-contracts-1           | }
+coin-toss-contracts-1 exited with code 0
+coin-toss-authority-deployer-1  | Nothing to compile
+coin-toss-authority-deployer-1  | No need to generate any newer typings.
+coin-toss-authority-deployer-1  | deploying "Authority" (tx: 0x2d78af268ea1062233804015d5c87385f2c556980453ac72fd50a95ac64f6e
+a2)...: deployed at 0xAC6Ea206323890AB9aC7B0498CB959eDc903323c with 509892 gas
+coin-toss-authority-deployer-1  | deploying "History" (tx: 0x1cfe8a991271946f9c1e2fe31fae998165e760f20b3c39033a83a89edd23b542
+)...: deployed at 0xA19Bf1a17f49950B601f462037419B0a3591507d with 494590 gas
+coin-toss-authority-deployer-1  | npm notice
+coin-toss-authority-deployer-1  | npm notice New major version of npm available! 8.15.0 -> 10.3.0
+coin-toss-authority-deployer-1  | npm notice Changelog: <https://github.com/npm/cli/releases/tag/v10.3.0>
+coin-toss-authority-deployer-1  | npm notice Run `npm install -g npm@10.3.0` to update!
+coin-toss-authority-deployer-1  | npm notice
+coin-toss-authority-deployer-1 exited with code 0
+coin-toss-dapp-deployer-1       | Deploying DApp "trust-and-teach" on network "sepolia" using consensus address "0xAC6Ea20632
+3890AB9aC7B0498CB959eDc903323c"...
+coin-toss-dapp-deployer-1       | connecting to https://eth-sepolia.g.alchemy.com/v2/zgKNDGwnZuyQ03Z62T7YwTJiQ4dswB2S
+coin-toss-dapp-deployer-1       | using account "0x5873298b68497fad590f68221D9a8d134902DE64"
+coin-toss-dapp-deployer-1       | transaction: 0x70c25cdc0d40da3a7a941df8ab88c2ab9737c54ebe29b5979e2baebd4096d2bb
+coin-toss-dapp-deployer-1       | waiting for confirmation...
+coin-toss-dapp-deployer-1       | application: 0xc63224E278E77dC19595F75257804aDe182d3E8e
+coin-toss-dapp-deployer-1       | writing application address to /deployments/sepolia/trust-and-teach.json
+coin-toss-dapp-deployer-1 exited with code 0
+
+
+
+ubuntu@ip-172-31-7-92 ~/p/t/coin-toss (ic10deploy)> source contract_rw_vars_sepolia.fish
+ubuntu@ip-172-31-7-92 ~/p/t/coin-toss (ic10deploy)> docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --priv
+ate-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"set_dapp_address(address)\" $DAPP_ADDRESS"
+                                                          docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send
+--private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"sendInstructionPrompt(string)\" \"When \""
+
+blockHash               0x298a37b7f934d066e3502c86cc05bc58279b26e1d5b4857fe656d3bbf96c7443
+blockNumber             5132924
+contractAddress
+cumulativeGasUsed       2735806
+effectiveGasPrice       43968728116
+gasUsed                 21432
+logs                    []
+logsBloom               0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000
+root
+status                  1
+transactionHash         0x22b59e82aba8babe11087752a8690296202ffdf6b5b00d65e0dd8a597d1d311a
+transactionIndex        42
+type                    2
+
+blockHash               0xbb5ed0a95f5e626a22ba2f62848eb64bffd39112ffdc80fc892c857ea984a7c0
+blockNumber             5132925
+contractAddress
+cumulativeGasUsed       4004285
+effectiveGasPrice       42643485697
+gasUsed                 21520
+logs                    []
+logsBloom               0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000
+root
+status                  1
+transactionHash         0xc4720d7f90f04f5ce87b7aea9a7e9455bf3299afd7ea412b8b0b621b94a547f5
+transactionIndex        61
+type                    2
+ubuntu@ip-172-31-7-92 ~/p/t/coin-toss (ic10deploy)> p mnemonic.txt
+Successfully generated a new mnemonic.
+Phrase:
+phrase rotate stage match marble cause alien ecology security unit south ahead
+
+Accounts:
+- Account 0:
+Address:     0x5873298b68497fad590f68221D9a8d134902DE64
+Private key: 0x24bdc263fd61b12b5995e5120564734f2180e5ce6bdafe3a37342d548d2a5b8f
+
+ubuntu@ip-172-31-7-92 ~/p/t/coin-toss (ic10deploy)> p contract_rw_vars_sepolia.fish
+#!/usr/bin/env fish
+set PLAYER1_PRIVATE_KEY "0x24bdc263fd61b12b5995e5120564734f2180e5ce6bdafe3a37342d548d2a5b8f"
+set COIN_TOSS_ADDRESS "0x5873298b68497fad590f68221D9a8d134902DE64"
+set DAPP_ADDRESS "0xc63224e278e77dc19595f75257804ade182d3e8e"
+set RPC_URL "https://eth-sepolia.g.alchemy.com/v2/zgKNDGwnZuyQ03Z62T7YwTJiQ4dswB2S"
+
+
+
+
+coin-toss-database-1        | 2024-01-22 12:07:47.134 UTC [36] LOG:  aborting any active transactions
+coin-toss-database-1        | 2024-01-22 12:07:47.137 UTC [36] LOG:  background worker "logical replication launcher" (PID 43
+) exited with exit code 1
+coin-toss-database-1        | 2024-01-22 12:07:47.137 UTC [38] LOG:  shutting down
+coin-toss-database-1        | 2024-01-22 12:07:47.154 UTC [36] LOG:  database system is shut down
+coin-toss-database-1        |  done
+coin-toss-database-1        | server stopped
+coin-toss-database-1        |
+coin-toss-database-1        | PostgreSQL init process complete; ready for start up.
+coin-toss-database-1        |
+coin-toss-database-1        | 2024-01-22 12:07:47.253 UTC [1] LOG:  starting PostgreSQL 13.13 on x86_64-pc-linux-musl, compil
+ed by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
+coin-toss-database-1        | 2024-01-22 12:07:47.253 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+coin-toss-database-1        | 2024-01-22 12:07:47.254 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+coin-toss-database-1        | 2024-01-22 12:07:47.258 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.54
+32"
+coin-toss-database-1        | 2024-01-22 12:07:47.263 UTC [49] LOG:  database system was shut down at 2024-01-22 12:07:47 UTC
+coin-toss-database-1        | 2024-01-22 12:07:47.268 UTC [1] LOG:  database system is ready to accept connections
+coin-toss-indexer-1         | 2024-01-22T12:07:56.371781Z  INFO indexer: starting indexer config=IndexerConfig { repository_c
+onfig: RepositoryConfig { user: "postgres", password: [REDACTED], hostname: "database", port: 5432, db: "postgres", connectio
+n_pool_size: 3, backoff: ExponentialBackoff { current_interval: 500ms, initial_interval: 500ms, randomization_factor: 0.5, mu
+ltiplier: 1.5, max_interval: 60s, start_time: Instant { tv_sec: 2425, tv_nsec: 786647620 }, max_elapsed_time: Some(120s), clo
+ck: SystemClock } }, dapp_metadata: DAppMetadata { chain_id: 11155111, dapp_address: c63224e278e77dc19595f75257804ade182d3e8e
+ }, broker_config: BrokerConfig { redis_endpoint: Single(redis://redis:6379), consume_timeout: 5000, backoff: ExponentialBack
+off { current_interval: 500ms, initial_interval: 500ms, randomization_factor: 0.5, multiplier: 1.5, max_interval: 60s, start_
+time: Instant { tv_sec: 2425, tv_nsec: 786718190 }, max_elapsed_time: Some(120s), clock: SystemClock } }, healthcheck_port: 8
+080 }
+coin-toss-indexer-1         | 2024-01-22T12:07:56.372348Z  INFO indexer::indexer: running database migrations
+coin-toss-graphql_server-1  |  INFO graphql_server: starting graphql http service config=GraphQLConfig { graphql_host: "0.0.0
+.0", graphql_port: 4000, repository_config: RepositoryConfig { user: "postgres", password: [REDACTED], hostname: "database",
+port: 5432, db: "postgres", connection_pool_size: 3, backoff: ExponentialBackoff { current_interval: 500ms, initial_interval:
+ 500ms, randomization_factor: 0.5, multiplier: 1.5, max_interval: 60s, start_time: Instant { tv_sec: 2425, tv_nsec: 791836534
+ }, max_elapsed_time: Some(120s), clock: SystemClock } }, healthcheck_port: 8080 }
+coin-toss-graphql_server-1  |  INFO rollups_data::repository: trying to create db pool for database config=RepositoryConfig {
+ user: "postgres", password: [REDACTED], hostname: "database", port: 5432, db: "postgres", connection_pool_size: 3, backoff:
+ExponentialBackoff { current_interval: 500ms, initial_interval: 500ms, randomization_factor: 0.5, multiplier: 1.5, max_interv
+al: 60s, start_time: Instant { tv_sec: 2425, tv_nsec: 791836534 }, max_elapsed_time: Some(120s), clock: SystemClock } }
+coin-toss-graphql_server-1  |  INFO actix_server::builder: starting 4 workers
+coin-toss-graphql_server-1  |  INFO actix_server::server: Actix runtime found; starting in Actix runtime
+coin-toss-indexer-1         | 2024-01-22T12:07:56.461577Z  INFO indexer::indexer: runned migrations; connecting to DB
+coin-toss-indexer-1         | 2024-01-22T12:07:56.463946Z  INFO rollups_data::repository: trying to create db pool for databa
+se config=RepositoryConfig { user: "postgres", password: [REDACTED], hostname: "database", port: 5432, db: "postgres", connec
+tion_pool_size: 3, backoff: ExponentialBackoff { current_interval: 500ms, initial_interval: 500ms, randomization_factor: 0.5,
+ multiplier: 1.5, max_interval: 60s, start_time: Instant { tv_sec: 2425, tv_nsec: 786647620 }, max_elapsed_time: Some(120s),
+clock: SystemClock } }
+coin-toss-indexer-1         | 2024-01-22T12:07:56.467959Z  INFO indexer::indexer: connected to database; connecting to broker
+coin-toss-indexer-1         | 2024-01-22T12:07:56.469554Z  INFO indexer::indexer: connected to broker; starting main loop
+coin-toss-indexer-1         | 2024-01-22T12:07:56.469561Z  INFO indexer::indexer: waiting for next event self.state=IndexerSt
+ate { inputs_last_id: "0", outputs_last_id: "0", inputs_stream: RollupsInputsStream { key: "{chain-11155111:dapp-c63224e278e7
+7dc19595f75257804ade182d3e8e}:rollups-inputs" }, outputs_stream: RollupsOutputsStream { key: "{chain-11155111:dapp-c63224e278
+e77dc19595f75257804ade182d3e8e}:rollups-outputs" } }
+coin-toss-advance_runner-1  | 2024-01-22T12:07:56.485904Z  INFO advance_runner: starting advance runner config=AdvanceRunnerC
+onfig { server_manager_config: ServerManagerConfig { server_manager_endpoint: "http://server_manager:5001", session_id: "defa
+ult_rollups_id", pending_inputs_sleep_duration: 1000, pending_inputs_max_retries: 600, runtime_config: MachineRuntimeConfig {
+ concurrency: Some(ConcurrencyConfig { update_merkle_tree: 0 }) }, deadline_config: DeadlineConfig { checkin: 5000, advance_s
+tate: 180000, advance_state_increment: 10000, inspect_state: 180000, inspect_state_increment: 10000, machine: 300000, store:
+180000, fast: 5000 }, cycles_config: CyclesConfig { max_advance_state: 4611686018427387903, advance_state_increment: 4194304,
+ max_inspect_state: 4611686018427387903, inspect_state_increment: 4194304 } }, broker_config: BrokerConfig { redis_endpoint:
+Single(redis://redis:6379), consume_timeout: 5000, backoff: ExponentialBackoff { current_interval: 500ms, initial_interval: 5
+00ms, randomization_factor: 0.5, multiplier: 1.5, max_interval: 60s, start_time: Instant { tv_sec: 2425, tv_nsec: 896047144 }
+, max_elapsed_time: Some(120s), clock: SystemClock } }, dapp_metadata: DAppMetadata { chain_id: 11155111, dapp_address: c6322
+4e278e77dc19595f75257804ade182d3e8e }, snapshot_config: FileSystem(FSManagerConfig { snapshot_dir: "/var/opt/cartesi/machine-
+snapshots", snapshot_latest: "/var/opt/cartesi/machine-snapshots/latest" }), backoff_max_elapsed_duration: 120s, healthcheck_
+port: 8080 }
+coin-toss-advance_runner-1  | 2024-01-22T12:07:56.500811Z  INFO advance_runner::runner: got latest snapshot snapshot=Snapshot
+ { path: "/var/opt/cartesi/machine-snapshots/0_0", epoch: 0, processed_input_count: 0 }
+coin-toss-server_manager-1  | 2024-01-22 12-07-56 info remote-cartesi-machine pid:23 ppid:1 Initializing server on localhost:
+0
+coin-toss-inspect_server-1  | [2024-01-22T12:07:56Z INFO  inspect_server] starting inspect server with InspectServerConfig {
+inspect_server_address: "0.0.0.0:5005", server_manager_address: "server_manager:5001", session_id: "default_rollups_id", queu
+e_size: 100, inspect_path_prefix: "/inspect", healthcheck_port: 8080 }
+coin-toss-inspect_server-1  | [2024-01-22T12:07:56Z INFO  actix_server::builder] starting 4 workers
+coin-toss-inspect_server-1  | [2024-01-22T12:07:56Z INFO  actix_server::server] Tokio runtime found; starting in existing Tok
+io runtime
+coin-toss-dispatcher-1      | 2024-01-22T12:07:57.005845Z  INFO dispatcher::dispatcher: Setting up dispatcher with config: Di
+spatcherConfig { sc_config: SCConfig { grpc_endpoint: "http://state_server:50051", default_confirmations: 10 }, tx_config: Tx
+ManagerConfig { default_confirmations: 11, provider_http_endpoint: "https://eth-sepolia.g.alchemy.com/v2/zgKNDGwnZuyQ03Z62T7Y
+wTJiQ4dswB2S", chain_id: 11155111, chain_is_legacy: false, database_path: "./default_tx_database", gas_oracle_api_key: "" },
+broker_config: BrokerConfig { redis_endpoint: Single(redis://redis:6379), consume_timeout: 5000, backoff: ExponentialBackoff
+{ current_interval: 500ms, initial_interval: 500ms, randomization_factor: 0.5, multiplier: 1.5, max_interval: 60s, start_time
+: Instant { tv_sec: 2426, tv_nsec: 412545677 }, max_elapsed_time: Some(120s), clock: SystemClock } }, auth_config: Mnemonic {
+ mnemonic: "phrase rotate stage match marble cause alien ecology security unit south ahead", account_index: None }, dapp_depl
+oyment: DappDeployment { dapp_address: 0xc63224e278e77dc19595f75257804ade182d3e8e, deploy_block_hash: 0xca77bd4185266eb6552b5
+f1e9cca4ef438a1fd5d16c2b22f96020ab7b305b47e }, rollups_deployment: RollupsDeployment { history_address: 0xa19bf1a17f49950b601
+f462037419b0a3591507d, authority_address: 0xac6ea206323890ab9ac7b0498cb959edc903323c, input_box_address: 0x59b22d57d4f067708a
+b0c00552767405926dc768 }, epoch_duration: 300, priority: Normal }
+coin-toss-dispatcher-1      | 2024-01-22T12:07:57.060512Z  INFO http_server: Starting HTTP server at 0.0.0.0:8080
+coin-toss-advance_runner-1  | 2024-01-22T12:08:09.430551Z  INFO advance_runner::runner: starting runner main loop last_id="0"
