@@ -10,7 +10,7 @@ services:
   contracts:
     build: ./contracts
     environment:
-      - CONTRACTS=CoinToss
+      - CONTRACTS=${CONTRACT_NAME:?undefine CONTRACT_NAME}
       - MNEMONIC=${MNEMONIC:?undefined MNEMONIC}
       - RPC_URL=${RPC_URL:?undefined RPC_URL}
       - NETWORK=${NETWORK:?undefined NETWORK}
