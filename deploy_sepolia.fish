@@ -4,7 +4,7 @@ DAPP_NAME="trust-and-teach" docker compose --env-file env.sepolia -f deploy-test
 DAPP_NAME="trust-and-teach" docker compose --env-file env.sepolia -f deploy-testnet.yml down -v #stop docker after finish
 DAPP_NAME="trust-and-teach" docker compose --env-file env.sepolia -f docker-compose-testnet.yml up
 DAPP_NAME="trust-and-teach" docker compose --env-file env.sepolia -f docker-compose-testnet.yml -f docker-compose-host-testnet.yml up # host mode
-docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"set_dapp_address(address)\" $DAPP_ADDRESS"
-docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $COIN_TOSS_ADDRESS \"sendInstructionPrompt(string)\" \"hi. \""
+docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $TRUST_AND_TEACH_ADDRESS \"set_dapp_address(address)\" $DAPP_ADDRESS"
+docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $TRUST_AND_TEACH_ADDRESS \"sendInstructionPrompt(string)\" \"hi. \""
 
 
