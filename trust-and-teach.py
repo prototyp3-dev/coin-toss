@@ -29,11 +29,7 @@ logger.info(f"HTTP rollup_server url is {rollup_server}")
 k = keccak.new(digest_bits=256)
 announcePromptResponse = k.update(b'announcePromptResponse(uint256,uint256,uint256,string)').digest()[:4] # first 4 bytes
 
-# logger.info(f"HTTP rollup_server url is {rollup_server}")
-PROMPT_CMD_head = "./run stories15M.bin -t 0.8 -n 4 -i '"
-PROMPT_CMD_tail = "' ; exit 0"
-# PROMPT_CMD_tail = "' | sed 's/[^a-zA-Z ]//g' ; exit 0"
-# PROMPT_CMD_tail = "' 2>/dev/null | sed 's/[^a-zA-Z ]//g' | tr -d \\n ; exit 0"
+logger.info(f"HTTP rollup_server url is {rollup_server}")
 
 def hex2str(hex):
     """
@@ -56,26 +52,13 @@ def toss_coin(seed):
     random.seed(seed)
     return random.randint(0,1)
 
-def submitPrompt(input):
-    PROMPT_CMD = PROMPT_CMD_head + input + PROMPT_CMD_tail
-    # PROMPT_CMD = "echo 'prompt response'"
-    prompt_length_prefix = "prmptrsppp"
-    # prompt_length = 50
-    # prompt_length = 750
-    # prompt_length = 1000
-    prompt_length = 2000
-    # prompt_length_prefix length
-    prompt_length = prompt_length - len(prompt_length_prefix)
-    # random_sting = ''.join(random.choice(string.ascii_letters + ' ') for i in range(prompt_length))
-    # PROMPT_CMD = "echo '"+prompt_length_prefix+random_sting+"'"
+def submitPrompt(input,llmSteps=1):
+    PROMPT_CMD = "./run stories15M.bin -t 0.8 -n " + str(llmSteps) + " -i '" + input + "' ; exit 0"
 
     logger.info(f"ttttt Prompt command: {PROMPT_CMD}")
     promptResponse = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
     logger.info(f"kkkkk Prompt response: {promptResponse}")
 
-    # PROMPT_CMD = "echo 'When the sun shone on the outside Little Joey and his mommy walked outside The sky was blue and the sun was shining brightly Little Joey was so excited that he ran outside to get a tasty ice cream coneMommy said Lets go to the ice cream shop Little Joey smiled and he ran as fast as he could to get his ice cream He reached the shop and chose his favorite flavor'"
-    # promptResponse = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
-    # logger.info(f"zzzzz Prompt response: {promptResponse}")
     return promptResponse
 
 
@@ -95,15 +78,16 @@ def handle_advance(data):
         binary = bytes.fromhex(data["payload"][2:])
 
         # decode payload
-        conversationId, promptInput = decode_abi(['uint256', 'string'], binary)
-        logger.info(f"Received promptInput: {promptInput}, from conversationId: {conversationId}")
+        conversationId, llmSteps, promptInput = decode_abi(['uint256', 'uint256', 'string'], binary)
+        logger.info(f"||||||---->>  Received promptInput: {promptInput}, from conversationId: {conversationId} with {llmSteps} steps")
 
 
         promptLLMResponses = []
         n_responses = 2
         response_split_length = 512
         for i in range(n_responses):
-            promptLLMResponse_whole = [submitPrompt(promptInput)]
+            # promptLLMResponse_whole = [submitPrompt(promptInput)]
+            promptLLMResponse_whole = [submitPrompt(promptInput,llmSteps)]
             logger.info(f"Prompt rrresponseee: {promptLLMResponse_whole[0]}")
             # split the response into a list of strings of 512 characters
             promptLLMResponse_splits = [promptLLMResponse_whole[0][i:i+response_split_length] for i in range(0, len(promptLLMResponse_whole[0]), response_split_length)]

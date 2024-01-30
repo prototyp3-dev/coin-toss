@@ -62,17 +62,9 @@ contract TrustAndTeach {
         uint256 llmSteps,
         string memory prompt
     ) public {
-        // bytes memory payload = abi.encode(conversation_id, llmSteps, prompt);
-        bytes memory payload = abi.encode(conversation_id, prompt);
+        bytes memory payload = abi.encode(conversation_id, llmSteps, prompt);
         inputBox.addInput(L2_DAPP, payload);
     }
-
-    // function cartesiSubmitPrompt(uint256 conversation_id, string memory prompt)
-    //     public
-    // {
-    //     bytes memory payload = abi.encode(conversation_id, prompt);
-    //     inputBox.addInput(L2_DAPP, payload);
-    // }
 
     function getPromptByConversationId(uint256 conversation_id)
         public
