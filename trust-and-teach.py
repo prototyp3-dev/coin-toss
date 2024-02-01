@@ -55,9 +55,9 @@ def toss_coin(seed):
 def submitPrompt(input,llmSteps=1):
     PROMPT_CMD = "./run stories15M.bin -t 0.8 -n " + str(llmSteps) + " -i '" + input + "' ; exit 0"
 
-    logger.info(f"ttttt Prompt command: {PROMPT_CMD}")
+    logger.info(f"LLM Prompt command: {PROMPT_CMD}")
     promptResponse = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
-    logger.info(f"kkkkk Prompt response: {promptResponse}")
+    logger.info(f"LLM Prompt response: {promptResponse}")
 
     return promptResponse
 
@@ -79,28 +79,23 @@ def handle_advance(data):
 
         # decode payload
         conversationId, promptInput, llmSteps = decode_abi(['uint256', 'string', 'uint256'], binary)
-        logger.info(f"||||||---->>  Received promptInput: {promptInput}, from conversationId: {conversationId} with {llmSteps} steps")
+        logger.info(f"Received promptInput: {promptInput}, from conversationId: {conversationId} with {llmSteps} steps")
 
 
         promptLLMResponses = []
         n_responses = 2
         response_split_length = 512
         for i in range(n_responses):
-            # promptLLMResponse_whole = [submitPrompt(promptInput)]
             promptLLMResponse_whole = [submitPrompt(promptInput,llmSteps)]
-            logger.info(f"Prompt rrresponseee: {promptLLMResponse_whole[0]}")
             # split the response into a list of strings of 512 characters
             promptLLMResponse_splits = [promptLLMResponse_whole[0][i:i+response_split_length] for i in range(0, len(promptLLMResponse_whole[0]), response_split_length)]
-            logger.info(f"Prompt rrresssssponseee: {promptLLMResponse_splits}")
+            logger.info(f"Prompt response splits: {promptLLMResponse_splits}")
             promptLLMResponses += [ promptLLMResponse_splits ]
-
-        logger.info(f">>>>>>>[]> <> promptLLMResponses: {promptLLMResponses}")
-        logger.info(f">>>>>>>00> <> promptLLMResponses: {promptLLMResponses[0][0]}")
 
         notices = []
         for i in range(len(promptLLMResponses)):
             for j in range(len(promptLLMResponses[i])):
-                logger.info(f">>>>>>>looppp <> {i} - {j} ")
+                logger.info(f"Loop over LLM Responses and splits: {i} - {j} ")
                 notice = {
                             "conversationId": conversationId,
                             "promptAuthor": promptAuthor_addr,
@@ -111,7 +106,7 @@ def handle_advance(data):
                             "promptLLMResponseSplit": j,
                             "promptLLMResponse": promptLLMResponses[i][j]
                         }
-                logger.info(f">>>>>>>nnnnnspsp> <> notice: {notice}")
+                logger.info(f"LLM related notice: {notice}")
                 post("notice", {"payload": str2hex(json.dumps(notice))})
                 notices += [ notice ]
 
