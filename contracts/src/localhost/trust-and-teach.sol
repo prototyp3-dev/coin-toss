@@ -41,7 +41,7 @@ contract TrustAndTeach {
         L2_DAPP = l2_dapp;
     }
 
-    function sendInstructionPrompt(uint256 llmSteps, string memory prompt)
+    function sendInstructionPrompt(string memory prompt, uint256 llmSteps)
         public
     {
         // require(L2_DAPP != address(0));
@@ -62,7 +62,7 @@ contract TrustAndTeach {
         uint256 llmSteps,
         string memory prompt
     ) public {
-        bytes memory payload = abi.encode(conversation_id, llmSteps, prompt);
+        bytes memory payload = abi.encode(conversation_id, prompt, llmSteps);
         inputBox.addInput(L2_DAPP, payload);
     }
 

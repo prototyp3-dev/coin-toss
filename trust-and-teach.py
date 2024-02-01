@@ -78,7 +78,7 @@ def handle_advance(data):
         binary = bytes.fromhex(data["payload"][2:])
 
         # decode payload
-        conversationId, llmSteps, promptInput = decode_abi(['uint256', 'uint256', 'string'], binary)
+        conversationId, promptInput, llmSteps = decode_abi(['uint256', 'string', 'uint256'], binary)
         logger.info(f"||||||---->>  Received promptInput: {promptInput}, from conversationId: {conversationId} with {llmSteps} steps")
 
 
