@@ -64,12 +64,6 @@ def submitPrompt(input,llmSteps=1):
 
 def handle_advance(data):
     logger.info(f"Received advance request data {data}")
-    noticett = {
-        "timestamp": data["metadata"]["timestamp"],
-        "wier": "test"
-    }
-    post("notice", {"payload": str2hex(json.dumps(noticett))})
-
     status = "accept"
     try:
         promptAuthor_addr = data["metadata"]["msg_sender"]

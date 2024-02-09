@@ -80,7 +80,8 @@ contract TrustAndTeach {
         uint256 iResponse,
         uint256 iSplitResponse,
         string memory splitResponse
-    ) public {
+    ) public // cartesi runs this one
+    {
         // require(msg.sender == L2_DAPP);
         require(
             conversation_id <= current_conversation_id,
