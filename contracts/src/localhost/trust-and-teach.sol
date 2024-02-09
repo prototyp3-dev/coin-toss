@@ -190,6 +190,11 @@ contract TrustAndTeach {
         return submission.ranks;
     }
 
+    // Returns the count of conversations that have been created
+    function getConversationCount() public view returns (uint256) {
+        return current_conversation_id;
+    }
+
     // get a specific rank submitted by a user for a conversation at a given index
     function getRankByUserAtIndex(
         uint256 conversation_id,
