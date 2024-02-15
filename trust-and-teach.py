@@ -56,7 +56,8 @@ def submitPrompt(input,llmSteps=1):
     PROMPT_CMD = "./run stories15M.bin -t 0.8 -n " + str(llmSteps) + " -i '" + input + "' ; exit 0"
 
     logger.info(f"LLM Prompt command: {PROMPT_CMD}")
-    promptResponse = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
+    promptResponse = subprocess.check_output(PROMPT_CMD, shell=True).decode()
+    # promptResponse = subprocess.check_output(PROMPT_CMD, shell=True, stderr=subprocess.STDOUT).decode()
     logger.info(f"LLM Prompt response: {promptResponse}")
 
     return promptResponse
