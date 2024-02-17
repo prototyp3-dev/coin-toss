@@ -195,6 +195,11 @@ contract TrustAndTeach {
         return current_conversation_id;
     }
 
+    // Returns the address of the deployer
+    function getDeployer() public view returns (address) {
+        return deployer;
+    }
+
     // get a specific rank submitted by a user for a conversation at a given index
     function getRankByUserAtIndex(
         uint256 conversation_id,
