@@ -44,7 +44,7 @@ contract TrustAndTeach {
     function sendInstructionPrompt(string memory prompt, uint256 llmSteps)
         public
     {
-        // require(L2_DAPP != address(0));
+        require(L2_DAPP != address(0));
         Conversation storage conversation = conversations[
             current_conversation_id
         ];
@@ -82,7 +82,7 @@ contract TrustAndTeach {
         string memory splitResponse
     ) public // cartesi runs this one
     {
-        // require(msg.sender == L2_DAPP);
+        require(msg.sender == L2_DAPP);
         require(
             conversation_id <= current_conversation_id,
             "invalid conversation id, too high"
