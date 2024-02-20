@@ -197,10 +197,16 @@ yarn start voucher execute --index 1 --input 0
 ```
 
 7. Check the value of the `last_game` variable in the `TrustAndTeach` smart contract to see the persisted result in layer-1 due to the voucher execution.
-6. You can see the 
+6. You can see the on-chain conversation object. It has both of the responses.
 
 ```shell
-docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --rpc-url $RPC_URL ${TRUST_AND_TEACH} \"last_game()\""
+docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --rpc-url $RPC_URL $TRUST_AND_TEACH_ADDRESS \"getConversationById(uint256)\" 0"
+```
+
+decoding doesn't work atm:
+
+```shell
+docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast abi-decode \"getConversationResponseLength(uint256,uint256)\" \$(cast call --private-key $USER_PRIVATE_KEY --rpc-url $RPC_URL $TRUST_AND_TEACH_ADDRESS \"getConversationById(uint256)\" 0)  "
 ```
 
 ^ **The value was chosen for testing purposes, do not use it in production!!!** The default value is 1 week.

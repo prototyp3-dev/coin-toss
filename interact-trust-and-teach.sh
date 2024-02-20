@@ -6,6 +6,7 @@ export RPC_URL="http://localhost:8545"
 
 docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $USER_PRIVATE_KEY --rpc-url $RPC_URL $TRUST_AND_TEACH_ADDRESS \"set_dapp_address(address)\" $DAPP_ADDRESS"
 docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $USER_PRIVATE_KEY --rpc-url $RPC_URL $TRUST_AND_TEACH_ADDRESS \"sendInstructionPrompt(string,uint256)\" \"Once\" 40"
+docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --private-key $USER_PRIVATE_KEY --rpc-url $RPC_URL $TRUST_AND_TEACH_ADDRESS \"getConversationById(uint256)\" 0"
 
 cd ../rollups-examples/frontend-console/
 yarn && yarn build
