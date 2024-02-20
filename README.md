@@ -24,6 +24,10 @@ shows:
 
 # Trust-and-Teach AI DApp
 
+<!--START_SECTION:update_image-->
+<img src="./diagrams/usersequence.mmd.svg?jl" width="500">
+<!--END_SECTION:update_image-->
+
 ## Motivation
 
 This DApp is reinforcement learning with human feedback (RLHF) on-chain, leverging on-chain trust, scalability, transparensy, and reputation.
