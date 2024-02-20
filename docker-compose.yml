@@ -116,7 +116,7 @@ services:
       SNAPSHOT_LATEST: /var/opt/cartesi/machine-snapshots/latest
 
   server_manager:
-    image: ${DAPP_IMAGE:-cartesi/dapp:coin-toss-devel-server}
+    image: ${DAPP_IMAGE:-cartesi/dapp:trust-and-teach-devel-server}
     restart: always
     ports:
       - "5001:5001"

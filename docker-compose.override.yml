@@ -8,7 +8,7 @@ services:
       hardhat:
         condition: service_healthy
     environment:
-      - CONTRACTS=CoinToss
+      - CONTRACTS=TrustAndTeach
       - RPC_URL=http://localhost:8545
       - MNEMONIC=test test test test test test test test test test test junk
       - NETWORK=localhost
