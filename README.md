@@ -164,12 +164,6 @@ docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key
 
 ```
 
-3. The challenged player executes the same `play` method passing the challenger address. The input is then fetched by the Cartesi Node the coin toss is executed inside the Cartesi Machine. A notice and a voucher are generated.
-
-```shell
-docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER2_PRIVATE_KEY --rpc-url $RPC_URL $TRUST_AND_TEACH \"play(address)\" $USER"
-```
-
 4. (Optional) Check the notice and the voucher using the [frontend-console](https://github.com/cartesi/rollups-examples/tree/main/frontend-console).
 5. Wait for the dispute period to end to execute the voucher. The dispute period is set to 5 minutes in testnet^, as can be seen in `docker-compose-testnet.yml`. If running locally advance the time with the following command:
 
