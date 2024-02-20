@@ -164,6 +164,11 @@ docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key
 
 ```
 
+3. (Optional) Check that LLM generated the response
+```shell
+docker logs trust-and-teach-cartesi-server_manager-1
+```
+
 3. (Optional) Check the notice and the voucher using the [frontend-console](https://github.com/cartesi/rollups-examples/tree/main/frontend-console).
 
 4. Wait for the dispute period to end to execute the voucher. The dispute period is set to 5 minutes in testnet^, as can be seen in `docker-compose-testnet.yml`. If running locally advance the time with the following command:
@@ -179,6 +184,7 @@ yarn start voucher execute --index 1 --input 0
 ```
 
 7. Check the value of the `last_game` variable in the `TrustAndTeach` smart contract to see the persisted result in layer-1 due to the voucher execution.
+6. You can see the 
 
 ```shell
 docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --rpc-url $RPC_URL ${TRUST_AND_TEACH} \"last_game()\""
