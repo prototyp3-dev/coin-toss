@@ -1,7 +1,4 @@
-
-
 # Trust-and-Teach AI solidity contract and Cartesi back-End
-
 
 ## Building
 
