@@ -40,6 +40,11 @@ export MNEMONIC=<user sequence of twelve words>
 export RPC_URL=<https://your.rpc.gateway>
 ```
 
+You can create twelve mnemonic words with foundry:
+```shell
+docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast wallet new-mnemonic"
+```
+
 For example, to deploy to the Sepolia testnet using an Alchemy RPC node, you could execute:
 
 ```shell
