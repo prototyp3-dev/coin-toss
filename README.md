@@ -212,16 +212,3 @@ docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast abi-decode \"getCo
 ^ **The value was chosen for testing purposes, do not use it in production!!!** The default value is 1 week.
 
 
-
-**milestone: splitting a payload into multiple vouchers**
-works:
-- split LLM response into multiple vouchers
-- automated testing for multiple vouchers
-(details below)
-Problems I'm currently working on:
-- even though 200+ random :alpha: + space character strings work, the llama2.c inference doesn't post a notice.
-Todo: 
-- run on test net
-- write docs
-- simple ui
-
