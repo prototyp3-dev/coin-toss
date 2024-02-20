@@ -164,7 +164,7 @@ docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key
 
 ```
 
-3. (Optional) Check that LLM generated the response
+3. (Optional) Check that LLM generated the response and Cartesi backend created the notices
 ```shell
 docker logs trust-and-teach-cartesi-server_manager-1
 ```
