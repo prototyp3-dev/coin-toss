@@ -178,6 +178,9 @@ curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[86
 ```
 5. List notices and vouchers using the `frontend-console`
 ```shell
+cd ../rollups-examples/frontend-console/
+yarn && yarn build
+yarn start notice list && yarn start voucher list
 
 ```
 
