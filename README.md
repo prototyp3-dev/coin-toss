@@ -33,17 +33,17 @@ docker buildx bake -f docker-bake.hcl -f docker-bake.override.hcl machine --load
 ```
 
 Once the machine docker image is ready, we can use it to deploy a corresponding Rollups smart contract.
-This requires you to specify the account and RPC gateway to use when submitting the deploy transaction on the target network, which can be done by defining the following environment variables:
+This requires you to specify the account, which for tesing purposes you can create using foundry
+```shell
+docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast wallet new-mnemonic"
+```
+and RPC gateway to use when submitting the deploy transaction on the target network, which can be done by defining the following environment variables:
 
 ```shell
 export MNEMONIC=<user sequence of twelve words>
 export RPC_URL=<https://your.rpc.gateway>
 ```
 
-You can create twelve mnemonic words with foundry:
-```shell
-docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast wallet new-mnemonic"
-```
 
 For example, to deploy to the Sepolia testnet using an Alchemy RPC node, you could execute:
 
