@@ -157,24 +157,25 @@ export RPC_URL="http://localhost:8545"
 docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $USER_PRIVATE_KEY --rpc-url $RPC_URL $TRUST_AND_TEACH \"set_dapp_address(address)\" $DAPP_ADDRESS"
 ```
 
-1. Execute the `sendInstructionPrompt` method passing the prompt and the number of total tokens in the response that include the generated tokens.
+2. Execute the `sendInstructionPrompt` method passing the prompt and the number of total tokens in the response that include the generated tokens.
 
 ```shell
 docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $USER_PRIVATE_KEY --rpc-url $RPC_URL $TRUST_AND_TEACH_ADDRESS \"sendInstructionPrompt(string,uint256)\" \"Once\" 10"
 
 ```
 
-1. (Optional) Check the notice and the voucher using the [frontend-console](https://github.com/cartesi/rollups-examples/tree/main/frontend-console).
+3. (Optional) Check the notice and the voucher using the [frontend-console](https://github.com/cartesi/rollups-examples/tree/main/frontend-console).
 
-1. Wait for the dispute period to end to execute the voucher. The dispute period is set to 5 minutes in testnet^, as can be seen in `docker-compose-testnet.yml`. If running locally advance the time with the following command:
+4. Wait for the dispute period to end to execute the voucher. The dispute period is set to 5 minutes in testnet^, as can be seen in `docker-compose-testnet.yml`. If running locally advance the time with the following command:
 
 ```shell
 curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[864010]}' http://localhost:8545
 ```
 
-6. Execute the voucher using the `frontend-console`.
+5. The LLM will output 2 vouchers; one for each response. Execute the vouchers using the `frontend-console`.
 ```shell
 yarn start voucher execute --index 0 --input 0
+yarn start voucher execute --index 1 --input 0
 ```
 
 7. Check the value of the `last_game` variable in the `TrustAndTeach` smart contract to see the persisted result in layer-1 due to the voucher execution.
