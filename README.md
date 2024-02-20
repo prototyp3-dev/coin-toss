@@ -154,7 +154,8 @@ export RPC_URL="http://localhost:8545"
 1. Execute the `set_dapp_address` method of the `trust-and-teach` contract to set the rollup contract address. This step is to allow the layer-1 contract to send inputs to the Cartesi Rollups DApp.
 
 ```shell
-docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER1_PRIVATE_KEY --rpc-url $RPC_URL $TRUST_AND_TEACH \"set_dapp_address(address)\" $DAPP_ADDRESS"
+docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $USER_PRIVATE_KEY --rpc-url $RPC_URL $TRUST_AND_TEACH_ADDRESS \"sendInstructionPrompt(string,uint256)\" \"Once\" 10"
+
 ```
 
 2. Execute the `play` method passing the opponent's address to challenge him for a coin toss game.
@@ -166,7 +167,7 @@ docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key
 3. The challenged player executes the same `play` method passing the challenger address. The input is then fetched by the Cartesi Node the coin toss is executed inside the Cartesi Machine. A notice and a voucher are generated.
 
 ```shell
-docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER2_PRIVATE_KEY --rpc-url $RPC_URL $TRUST_AND_TEACH \"play(address)\" $PLAYER1"
+docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast send --private-key $PLAYER2_PRIVATE_KEY --rpc-url $RPC_URL $TRUST_AND_TEACH \"play(address)\" $USER"
 ```
 
 4. (Optional) Check the notice and the voucher using the [frontend-console](https://github.com/cartesi/rollups-examples/tree/main/frontend-console).
