@@ -190,14 +190,14 @@ yarn start notice list && yarn start voucher list
 ln -s ../../trust-and-teach-cartesi/deployments/* ../deployments/
 ```
 
-5. The LLM will output 2 vouchers; one for each response. Execute the vouchers using the `frontend-console`.
+7. The LLM will output 2 vouchers; one for each response. Execute the vouchers using the `frontend-console`.
 ```shell
 yarn start voucher execute --index 0 --input 0
 yarn start voucher execute --index 1 --input 0
 ```
 
-7. Check the value of the `last_game` variable in the `TrustAndTeach` smart contract to see the persisted result in layer-1 due to the voucher execution.
-6. You can see the on-chain conversation object. It has both of the responses.
+8. Check the value of the `last_game` variable in the `TrustAndTeach` smart contract to see the persisted result in layer-1 due to the voucher execution.
+9. You can see the on-chain conversation object. It has both of the responses.
 
 ```shell
 docker run --rm --net="host" ghcr.io/foundry-rs/foundry "cast call --rpc-url $RPC_URL $TRUST_AND_TEACH_ADDRESS \"getConversationById(uint256)\" 0"
