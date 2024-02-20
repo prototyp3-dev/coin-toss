@@ -177,6 +177,15 @@ docker logs trust-and-teach-cartesi-server_manager-1
 curl --data '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[864010]}' http://localhost:8545
 ```
 5. List notices and vouchers using the `frontend-console`
+```shell
+
+```
+
+6. Give the dapp address to the `frontend-console`
+
+```shell
+ln -s ../../trust-and-teach-cartesi/deployments/* ../deployments/
+```
 
 5. The LLM will output 2 vouchers; one for each response. Execute the vouchers using the `frontend-console`.
 ```shell
